@@ -1,0 +1,300 @@
+openapi: 3.0.0
+info:
+  title: Local Confiugurations API
+  description: API for managing  local configurations. For device to store a bulk
+    of data inside server database. Device is responsible of creating/updating/deleting
+    content of data. Data is unique by device
+  contact:
+    name: Prabhu Chawandi
+    url: smardtv.com
+    email: prabhu.chawandi@smartdtv.com
+  version: 1.0.0
+servers:
+- url: https://smarthing-cloud-dev.com
+  description: Dev Server
+- url: https://smarthing-cloud.com
+  description: Prod Server
+paths:
+  /api/devices/v1/localconf/lconf_requests/{deviceId}:
+    patch:
+      summary: Add the local configuration details for VSAAS flavor
+      parameters:
+      - name: deviceId
+        in: path
+        description: Device Id for which local configuration is added
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Lconf'
+      responses:
+        200:
+          description: Successfull addition of the local configuration
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The device is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/localconf/lconf/list:
+    get:
+      summary: Get the list of local configurations.
+      parameters:
+      - name: page
+        in: query
+        description: Starting page, default 1.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: per_page
+        in: query
+        description: Number of results per page, default 20.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        200:
+          description: A list of local configurations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfLconf'
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/localconf/lconf/{deviceId}:
+    get:
+      summary: get the local configuration of a device.
+      parameters:
+      - name: deviceId
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: local configuration of a device returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lconf'
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: update the local configuration of a device.
+      parameters:
+      - name: deviceId
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: local configuration of a device is updated.
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: delete the local configuration of a device.
+      parameters:
+      - name: deviceId
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: local configuration of a device is deleted.
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/localconf/lconf/list/count:
+    get:
+      summary: get the count of local configurations.
+      responses:
+        200:
+          description: local configurations count.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    Lconf:
+      type: object
+      properties:
+        config_details:
+          type: string
+          description: JSON string with configurations details
+        device_id:
+          type: string
+          description: device id for which local configuration is created
+        id:
+          type: string
+          description: db assigned id
+        created_ts:
+          type: string
+          description: Created timestamp
+          format: datetime
+        updated_ts:
+          type: string
+          description: Updated timestamp
+          format: datetime
+      description: local configurations model
+      example:
+        config_details: '{ "protection_type" : "LinkProt", "key_rotation_period" :
+          "15", "key_predelivery_win" : "1", "cam_net_if" : "eth0", "cam_onvif_port"
+          : "92", "cam_rtsp_port" : "990", "cam_addr" : "9900", "cam_port" : "121"
+          }'
+        created_ts: 2019-04-16T06:44:16.386Z
+        device_id: 5ca5a5e53654df850001145049
+        id: 5cb579c066b19200019d546f
+        updated_ts: 2019-04-16T06:44:16.386Z
+    ArrayOfLconf:
+      type: array
+      description: array of local configurations
+      items:
+        $ref: '#/components/schemas/Lconf'
+    inline_response_200:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: number of entries in db
+      example: '{"count":5}'
+  responses:
+    UnauthorizedError:
+      description: Access token in missing or invalid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
