@@ -1,0 +1,661 @@
+openapi: 3.0.0
+info:
+  title: Device authentication [Management API]
+  description: |
+    Management API for device authentication handling.
+  version: 2.0.0
+servers:
+- url: http://mender-device-auth:8080/api/management/v2/devauth/
+paths:
+  /devices:
+    get:
+      summary: Get a list of tenant's devices.
+      description: |
+        Provides a list of tenant's devices, sorted by creation date, with optional device status filter.
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: status
+        in: query
+        description: |
+          Device status filter. If not specified, all devices are listed.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - pending
+          - accepted
+          - rejected
+          - preauthorized
+      - name: page
+        in: query
+        description: Results page number
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: number
+          format: integer
+          default: 1
+      - name: per_page
+        in: query
+        description: Number of results per page
+        required: false
+        style: form
+        explode: true
+        schema:
+          maximum: 500
+          type: number
+          format: integer
+          default: 20
+      responses:
+        200:
+          description: An array of devices.
+          headers:
+            Link:
+              description: Standard header, we support 'first', 'next', and 'prev'.
+              style: simple
+              explode: false
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        400:
+          description: Missing/malformed request params.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Submit a preauthorized device.
+      description: |
+        Adds a given device/authentication data set in the 'preauthorized' state. The device identity data set must not yet exist in the DB (regardless of status).
+
+        When the device requests authentication from deviceauth the next time, it will be issued a token without further user intervention.
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      requestBody:
+        description: Preauthentication request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreAuthSet'
+        required: true
+      responses:
+        201:
+          description: Device submitted.
+        400:
+          description: Missing/malformed request params.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Device already exists. Response contains conflicting device.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Device'
+        500:
+          description: Unexpected error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /devices/{id}:
+    get:
+      summary: Get a particular device.
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: id
+        in: path
+        description: Device identifier
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: Device found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Device'
+        404:
+          description: Device not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Decommission device
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: id
+        in: path
+        description: Device identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        204:
+          description: Device decommissioned.
+        404:
+          description: Device not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /devices/{id}/auth/{aid}:
+    delete:
+      summary: Remove the device authentication set
+      description: |
+        Removes the device authentication set.
+        Removing 'accepted' authentication set is equivalent
+        to rejecting device and removing authentication set.
+        If there is only one authentication set for the device
+        and the device is 'preauthorized' then the device
+        will also be deleted.
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: id
+        in: path
+        description: Device identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: aid
+        in: path
+        description: Authentication data set identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        204:
+          description: Device authentication set deleted.
+        404:
+          description: Device authentication set not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /devices/{id}/auth/{aid}/status:
+    get:
+      summary: Get the device authentication set status
+      description: |
+        Returns the status of a particular device authentication data set.
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: id
+        in: path
+        description: Device identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: aid
+        in: path
+        description: Authentication data set identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: |
+            successful response - the device's authentication set status is returned.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Status'
+            application/json:
+              examples:
+                response:
+                  value:
+                    status: accepted
+        404:
+          description: The device was not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update the device authentication set status
+      description: |
+        Sets the status of a authentication data set of selected value.
+        Valid state transitions:
+        - 'pending' -> 'accepted'
+        - 'pending' -> 'rejected'
+        - 'rejected' -> 'accepted'
+        - 'accepted' -> 'rejected'
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: id
+        in: path
+        description: Device identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: aid
+        in: path
+        description: Authentication data set identifier.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: New status.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
+        required: true
+      responses:
+        204:
+          description: The device authentication data set status was successfully
+            updated.
+        400:
+          description: Bad request.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: The device was not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: Request cannot be fulfilled e.g. due to exceeded limit on maximum
+            accepted devices (see error message).
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /devices/count:
+    get:
+      summary: Get a count of devices, optionally filtered by status.
+      description: |
+        Provides a list of devices, optionally filtered by status.
+      parameters:
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      - name: status
+        in: query
+        description: |
+          Device status filter, one of 'pending', 'accepted', 'rejected'. Default is 'all devices'.
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Device count.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Count'
+        400:
+          description: Missing/malformed request params.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tokens/{id}:
+    delete:
+      summary: Delete device token
+      description: |
+        Deletes the token, effectively revoking it. The device must
+        apply for a new one with a new authentication request.
+        The token 'id' corresponds to the standard 'jti' claim.
+      parameters:
+      - name: id
+        in: path
+        description: Unique token identifier('jti').
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        204:
+          description: The token was successfully deleted.
+        404:
+          description: The token was not found.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /limits/max_devices:
+    get:
+      summary: Obtain limit of accepted devices.
+      parameters:
+      - name: Authorization
+        in: header
+        description: |
+          Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: Bearer [token]
+      responses:
+        200:
+          description: Usage statistics and limits.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Limit'
+        500:
+          description: Internal server error.
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Status:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - pending
+          - accepted
+          - rejected
+        type:
+          type: string
+          description: type of the flavor
+        config_name:
+          type: string
+          description: configuration name to be mapped to this device.
+        flavor_name:
+          type: string
+          description: configuration flavor name to be mapped to this device.
+        unique_devparams:
+          type: string
+          description: JSON string of Unique device parameters like comments etc..
+      description: Admission status of the device.
+      example:
+        application/json:
+          status: accepted
+          type: VSAAS
+          flavor_name: VSAAS_Test
+          config_name: VSAAS_Test
+          unique_devparams: '"comment":"Test comment"'
+    Limit:
+      required:
+      - limit
+      type: object
+      properties:
+        limit:
+          type: integer
+      description: Limit definition
+      example:
+        application/json:
+          limit: 123
+    Device:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Mender assigned Device ID.
+        identity_data:
+          $ref: '#/components/schemas/IdentityData'
+        status:
+          type: string
+          enum:
+          - pending
+          - accepted
+          - rejected
+          - preauthorized
+        created_ts:
+          type: string
+          description: Created timestamp
+          format: datetime
+        updated_ts:
+          type: string
+          description: Updated timestamp
+          format: datetime
+        auth_sets:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthSet'
+        decommissioning:
+          type: boolean
+          description: Devices that are part of ongoing decomissioning process will
+            return True
+    AuthSet:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Authentication data set ID.
+        pubkey:
+          type: string
+          description: The device's public key, generated by the device or pre-provisioned
+            by the vendor.
+        identity_data:
+          $ref: '#/components/schemas/IdentityData'
+        status:
+          type: string
+          enum:
+          - pending
+          - accepted
+          - rejected
+          - preauthorized
+        ts:
+          type: string
+          description: Created timestamp
+          format: datetime
+      description: Authentication data set
+    Count:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: The count of requested items.
+      description: Counter type
+      example:
+        count: "42"
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error
+      description: Error descriptor
+    PreAuthSet:
+      required:
+      - identity_data
+      - pubkey
+      type: object
+      properties:
+        identity_data:
+          $ref: '#/components/schemas/IdentityData'
+        pubkey:
+          type: string
+          description: The device's public key, generated by the device or pre-provisioned
+            by the vendor.
+      example:
+        application/json:
+          identity_data:
+            application/json:
+              mac: 00:01:02:03:04:05
+              sku: My Device 1
+              sn: SN1234567890
+          pubkey: |
+            -----BEGIN PUBLIC KEY-----
+            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzogVU7RGDilbsoUt/DdH
+            VJvcepl0A5+xzGQ50cq1VE/Dyyy8Zp0jzRXCnnu9nu395mAFSZGotZVr+sWEpO3c
+            yC3VmXdBZmXmQdZqbdD/GuixJOYfqta2ytbIUPRXFN7/I7sgzxnXWBYXYmObYvdP
+            okP0mQanY+WKxp7Q16pt1RoqoAd0kmV39g13rFl35muSHbSBoAW3GBF3gO+mF5Ty
+            1ddp/XcgLOsmvNNjY+2HOD5F/RX0fs07mWnbD7x+xz7KEKjF+H7ZpkqCwmwCXaf0
+            iyYyh1852rti3Afw4mDxuVSD7sd9ggvYMc0QHIpQNkD4YWOhNiE1AB0zH57VbUYG
+            UwIDAQAB
+            -----END PUBLIC KEY-----
+    IdentityData:
+      type: object
+      properties:
+        mac:
+          type: string
+          description: MAC address.
+        sku:
+          type: string
+          description: Stock keeping unit.
+        sn:
+          type: string
+          description: Serial number.
+      description: |
+        Device identity attributes, in the form of a JSON structure.
+
+        The attributes are completely vendor-specific, the provided ones are just an example.
+        In reference implementation structure contains vendor-selected fields,
+        such as MACs, serial numbers, etc.
+      example:
+        application/json:
+          mac: 00:01:02:03:04:05
+          sku: My Device 1
+          sn: SN1234567890
