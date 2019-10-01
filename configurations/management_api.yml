@@ -42,7 +42,7 @@ x-tagGroups:
   - name: Flavors
     tags:  
       - flavor
-  - name: Configurations Map
+  - name: ConfigurationsMap
       - configmap
   - name: Models
     tags:
