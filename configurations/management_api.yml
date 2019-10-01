@@ -22,18 +22,6 @@ tags:
     description: Everything about config flavors
   - name: configmap
     description: Everything about config and flavor maps
-  - name: config_model
-    x-displayName: The configuration model
-    description: |
-       <SchemaDefinition schemaRef='#/components/schemas/Config'/>
-  - name: flavor_model
-    x-displayName: The config flavor model
-    description: |
-       <SchemaDefinition schemaRef='#/components/schemas/Flavor'/>
-  - name: configmap_model
-    x-displayName: The config flavor map model
-    description: |
-       <SchemaDefinition schemaRef='#/components/schemas/ConfigMap'/>
 
 x-tagGroups:
   - name: Configurations
@@ -45,12 +33,6 @@ x-tagGroups:
   - name: ConfigurationsMap
     tags:
       - configmap
-  - name: Models
-    tags:
-      - config_model
-      - flavor_model
-      - configmap_model
-  
 paths: 
   /api/management/v1/configurations/configs/list:
     post:
