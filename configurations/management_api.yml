@@ -30,7 +30,7 @@ x-tagGroups:
   - name: Flavors
     tags:  
       - flavor
-  - name: ConfigurationsMap
+  - name: Configurations Map
     tags:
       - configmap
 paths: 
