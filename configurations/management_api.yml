@@ -15,10 +15,46 @@ servers:
   - url: http://smarthing-cloud.com
     description: Prod Server
 
+tags:
+  - name: config
+    description: Everything about configurations
+  - name: flavor
+    description: Everything about config flavors
+  - name: configmap
+    description: Everything about config and flavor maps
+  - name: config_model
+    x-displayName: The configuration model
+    description: |
+       <SchemaDefinition schemaRef='#/components/schemas/Config'/>
+  - name: flavor_model
+    x-displayName: The config flavor model
+    description: |
+       <SchemaDefinition schemaRef='#/components/schemas/Flavor'/>
+  - name: configmap_model
+    x-displayName: The config flavor map model
+    description: |
+       <SchemaDefinition schemaRef='#/components/schemas/ConfigMap'/>
+
+x-tagGroups:
+  - name: Configurations
+    tags:
+      - config
+  - name: Flavors
+    tags:  
+      - flavor
+  - name: Configurations Map
+      - configmap
+  - name: Models
+    tags:
+      - config_model
+      - flavor_model
+      - configmap_model
   
 paths: 
   /api/management/v1/configurations/configs/list:
     post:
+      tags: 
+        - config
       summary: API to create new configuration
       requestBody:
         content:
@@ -52,6 +88,8 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     get:
+      tags: 
+        - config
       summary: Management API to list configurations
       responses:
         200:
@@ -83,6 +121,8 @@ paths:
       
   /api/management/v1/configurations/configs/{configId}:
     get:
+      tags: 
+        - config
       summary: get configuration by ID
       parameters: 
         - in: path
@@ -119,6 +159,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
+      tags: 
+        - config    
       description: Update the configuration
       parameters: 
         - in: path
@@ -158,6 +200,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       
     delete:
+      tags: 
+        - config    
       description: Delete the configuration
       parameters: 
         - in: path
@@ -193,6 +237,8 @@ paths:
   
   /api/management/v1/configurations/configs/list/count:
     get:
+      tags: 
+        - config    
       summary: get the count of configurtions
       responses:
         200:
@@ -230,6 +276,8 @@ paths:
     
   /api/management/v1/configurations/configs/list/type/{type}:   
     get:
+      tags: 
+        - config    
       summary: get configurations list by type
       parameters:
         - in: path
@@ -268,6 +316,8 @@ paths:
 
   /api/management/v1/configurations/flavors/list:
     post:
+      tags: 
+        - flavor    
       summary: API to create new configuration flavor
       requestBody:
         content:
@@ -301,6 +351,8 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     get:
+      tags: 
+        - flavor        
       summary: Management API to list configuration flavor
       description: API called by GUI to get the list of configurations flavors.
       responses:
@@ -333,6 +385,8 @@ paths:
       
   /api/management/v1/configurations/flavors/{flavorId}:
     get:
+      tags: 
+        - flavor        
       summary: get configuration flavor by ID
       parameters: 
         - in: path
@@ -369,6 +423,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
+      tags: 
+        - flavor        
       description: Update the configuration flaovr
       parameters: 
         - in: path
@@ -408,6 +464,8 @@ paths:
                 $ref: '#/components/schemas/Error'
       
     delete:
+      tags: 
+        - flavor        
       description: delete the configuration flavor
       parameters: 
         - in: path
@@ -443,6 +501,8 @@ paths:
   
   /api/management/v1/configurations/flavors/list/count:
     get:
+      tags: 
+        - flavor        
       summary: get the count of configurtion flavors
       responses:
         200:
@@ -480,6 +540,8 @@ paths:
     
   /api/management/v1/configurations/flavors/list/type/{type}:   
     get:
+      tags: 
+        - flavor        
       summary: get configuration flavors list by type
       parameters:
         - in: path
@@ -518,6 +580,8 @@ paths:
 
   /api/management/v1/configurations/configmaps/{deviceId}:
     get:
+      tags: 
+        - configmap        
       summary: Management API to get the configuration and flavor map for the deviceId
       description: GUI API to get configuration map for the device chosen device Id
         
@@ -556,6 +620,8 @@ paths:
 
   /api/management/v1/configurations/configmaps/list:   
     get:
+      tags: 
+        - configmap    
       summary: get configurations & flavors map list
       responses:
         200:
