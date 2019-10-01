@@ -1,64 +1,60 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'Local Confiugurations API'
-  description: 'API for managing  local configurations. For device to store a bulk of data inside server database. Device is responsible of creating/updating/deleting content of data. Data is unique by device'
+  title: 'Configurations API'
+  description: 'APIs for Managing configurations service. APIs for flavors, configurations and  configurations map. Server to send configuration map to a device. '
   contact:
     name: Prabhu Chawandi
     url: smardtv.com
-    email: prabhu.chawandi@smartdtv.com
+    email: prabhu.chawandi@smardtv.com
     
-servers: 
+servers:
   - url: https://smarthing-cloud-dev.com
     description: Dev Server
-   
-  - url: https://smarthing-cloud.com
+  
+  - url: http://smarthing-cloud.com
     description: Prod Server
 
+  
 paths: 
-  /api/devices/v1/localconf/lconf_requests/{deviceId}:
-    patch: 
-        summary: Add the local configuration details for VSAAS flavor
-        parameters:
-         - name : deviceId
-           required: true
-           in: path
-           description: Device Id for which local configuration is added
-           schema:
-             type: string
-        
-        requestBody:
+  /api/devices/v1/configurations/config_requests/{deviceId}:
+    get:
+      summary: Device API to get the configuration and flavor for the deviceId
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          description: Device Id of chosen device.
+          schema:
+            type: string
+      responses:
+        200:
+          description: configuration map
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Lconf'
-
-        responses:
-          200:
-            description: Successfull addition of the local configuration
-          
-          400:
-            description: Missing/malformed request parameters or body. See error for details.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-
-          401:
-            description: The device is not authenticated.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-
-          500:
-            description: Internal error.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/ConfigMap'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The device is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
+
   securitySchemes:
     bearerAuth:
       type: http
@@ -68,7 +64,9 @@ components:
   responses:
     UnauthorizedError:
       description: Access token in missing or invalid
-  schemas:      
+ 
+  schemas:
+  
     Error:
       description: Error descriptor.
       type: object
@@ -82,32 +80,56 @@ components:
       example:
         error: "failed to decode device group data: JSON payload is empty"
         request_id: "f7881e82-0492-49fb-b459-795654e7188a"
-
-    Lconf:
-      description: local configurations model
+       
+    ConfigMap:
+      description: Device configurations map
       type: object
       properties:
-        config_details:
-          description: JSON string with configurations details
-          type: string
+        configuration:
+          type: object
+          properties:
+            config_details:
+              description: JSON string of configurations
+              type: string
+            name:
+              description: name of the configuration
+              type: string
+            type:
+              description: type of the configuration
         device_id:
-          description: device id for which local configuration is created
+          description: device id under question
           type: string
-        id:
-          description: db assigned id
+        flavor:
+          description: flavor mapped to device
+          type: object
+          properties:
+            container:
+              description: JSON string of container details
+              type: string
+            name:
+              description: name of configuration flavor
+              type: string
+            type:
+              description: type of the cofiguration flavor
+              type: string
+        unique_dev_parameters:
+          description: Unique device parameters associated ex. comments
           type: string
-        created_ts:
-          type: string
-          format: datetime
-          description: Created timestamp
-        updated_ts:
-          type: string
-          format: datetime
-          description: Updated timestamp
       example:
-       config_details: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
-       created_ts: "2019-04-16T06:44:16.386Z"
-       device_id: "5ca5a5e53654df850001145049"
-       id: "5cb579c066b19200019d546f"
-       updated_ts: "2019-04-16T06:44:16.386Z"
-   
+        configuration: 
+           config_details: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
+           name: "VSASS_Test2"
+           type: "VSAAS"
+          
+        device_id: "5ca5c7352d740400018a214e"
+        flavor: 
+          container: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
+          name: "VSAAS"
+          type: "VSAAS"
+        unique_devparams: "testUniqueParams"
+
+    ArrayOfConfigmaps:
+      description: array of configurations - flavors map
+      type: array
+      items:
+        $ref: '#/components/schemas/ConfigMap'
