@@ -3,7 +3,7 @@
 
 ## __Feature list__
 1. Simple and secure on-boarding
-2. Over the air Update [OTA]
+2. Over the air Update \[ OTA \]
    1. Simple artefact creation
    2. easy deployment
    3. selective deployment
