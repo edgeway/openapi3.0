@@ -1,6 +1,5 @@
 # Overview
 
-
 ## Architectural style
  Microservices architecture is selected for known advantage of the architecture 
 
