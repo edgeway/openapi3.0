@@ -10,6 +10,14 @@
   **deviceauth**: Handles device authorisation, any request from the device will be handled by this service before authorization.
 
   **deployments**: Handles Over the air (OTA) updates, scheduling, triggering and etc...
+  
+  **inventory**: Stored the device inventory, it will be peridically updated.
+  
+  **api gateway**: Gateway for all the device and user requests.
+  
+  **storage proxy**: Gateway for storage, where artefacts will be stored.
+  
+  **minio**: The object storage.
 
   **configuration**: Handles configurations creation, updation and deletion.
 
