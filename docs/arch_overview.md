@@ -1,8 +1,6 @@
 # Overview
-
 ## Architectural style
  Microservices architecture is selected for known advantage of the architecture 
-
   ![Banner](https://raw.githubusercontent.com/arpsch/openapi3.0/master/docs/microservice_architecture.PNG)
   
   **useradm**: Handles user administration and role assignment.
