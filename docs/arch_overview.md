@@ -1,9 +1,8 @@
 # Overview
-<hr />
+
 
 ## Architectural style
  Microservices architecture is selected for known advantage of the architecture 
-<br />
 
   ![Banner](https://raw.githubusercontent.com/arpsch/openapi3.0/master/docs/microservice_architecture.PNG)
   
