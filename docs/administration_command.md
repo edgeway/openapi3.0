@@ -26,28 +26,28 @@ You should see output as below.
 ```
                 Name                              Command               State           Ports
 ------------------------------------------------------------------------------------------------------
-smarthingdev_mender-action_1           /usr/bin/action --config / ...   Up      8080/tcp
-smarthingdev_mender-api-gateway_1      /entrypoint.sh                   Up      0.0.0.0:443->443/tcp
-smarthingdev_mender-conductor_1        /srv/start_conductor.sh          Up      8080/tcp, 8090/tcp
-smarthingdev_mender-configurations_1   /usr/bin/configurations -- ...   Up      8080/tcp
-smarthingdev_mender-deployments_1      /entrypoint.sh --config /e ...   Up      8080/tcp
-smarthingdev_mender-device-auth_1      /usr/bin/deviceauth --conf ...   Up      8080/tcp
-smarthingdev_mender-elasticsearch_1    /docker-entrypoint.sh elas ...   Up      9200/tcp, 9300/tcp
-smarthingdev_mender-gui_1              /entrypoint.sh                   Up      80/tcp
-smarthingdev_mender-inventory_1        /usr/bin/inventory --confi ...   Up      8080/tcp
-smarthingdev_mender-localconf_1        /usr/bin/localconf --confi ...   Up      8080/tcp
-smarthingdev_mender-mongo_1            docker-entrypoint.sh mongod      Up      27017/tcp
-smarthingdev_mender-redis_1            /redis/entrypoint.sh             Up      6379/tcp
-smarthingdev_mender-useradm_1          /usr/bin/useradm --config  ...   Up      8080/tcp
-smarthingdev_minio_1                   /usr/bin/docker-entrypoint ...   Up      9000/tcp
-smarthingdev_storage-proxy_1           /usr/local/openresty/bin/o ...   Up      0.0.0.0:9000->9000/tcp
+smarthingprod_mender-action_1           /usr/bin/action --config / ...   Up      8080/tcp
+smarthingprod_mender-api-gateway_1      /entrypoint.sh                   Up      0.0.0.0:443->443/tcp
+smarthingprod_mender-conductor_1        /srv/start_conductor.sh          Up      8080/tcp, 8090/tcp
+smarthingprod_mender-configurations_1   /usr/bin/configurations -- ...   Up      8080/tcp
+smarthingprod_mender-deployments_1      /entrypoint.sh --config /e ...   Up      8080/tcp
+smarthingprod_mender-device-auth_1      /usr/bin/deviceauth --conf ...   Up      8080/tcp
+smarthingprod_mender-elasticsearch_1    /docker-entrypoint.sh elas ...   Up      9200/tcp, 9300/tcp
+smarthingprod_mender-gui_1              /entrypoint.sh                   Up      80/tcp
+smarthingprod_mender-inventory_1        /usr/bin/inventory --confi ...   Up      8080/tcp
+smarthingprod_mender-localconf_1        /usr/bin/localconf --confi ...   Up      8080/tcp
+smarthingprod_mender-mongo_1            docker-entrypoint.sh mongod      Up      27017/tcp
+smarthingprod_mender-redis_1            /redis/entrypoint.sh             Up      6379/tcp
+smarthingprod_mender-useradm_1          /usr/bin/useradm --config  ...   Up      8080/tcp
+smarthingprod_minio_1                   /usr/bin/docker-entrypoint ...   Up      9000/tcp
+smarthingprod_storage-proxy_1           /usr/local/openresty/bin/o ...   Up      0.0.0.0:9000->9000/tcp
 
 ```
 
 Once the system is up, follow command below to create the first user
 
 ```
-./run exec mender-useradm /usr/bin/useradm create-user --username=myusername@host.com --password=mysecretpassword --role=admin
+./run exec smarthingprod_mender-useradm /usr/bin/useradm create-user --username=myusername@host.com --password=mysecretpassword --role=admin
 
 ```
 > two roles are supported as of now : admin and viewer
