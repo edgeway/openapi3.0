@@ -50,7 +50,7 @@ Once the system is up, follow command below to create the first user
 ./run exec smarthingprod_mender-useradm /usr/bin/useradm create-user --username=myusername@host.com --password=mysecretpassword --role=admin
 
 ```
-> two roles are supported as of now : admin and viewer
+> two roles are supported as of now : **admin** and **viewer**
 
 Follow the bellow steps to launch the server by updating any docker images.
 ```
