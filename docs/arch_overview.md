@@ -18,6 +18,8 @@
   **actions**: This handles te actions triggered on the device. Every action will be tracked for the status after triggering and stores the updates from the device.
 
   **mongoDB**: MongoDB is used to as persistant store, this has a seperate database created from each service needing persistant store.
+  
+  **influxDB**: This is the timeseries DB from influxData. Time series data related to heartbeat, configurations, actions, local configurations are stored. UI can directly query timeseries DB for these data using influxDB query APIs.
 
   **multitenant**: This service handles multitenancy of the fleet, creation and management.
 
