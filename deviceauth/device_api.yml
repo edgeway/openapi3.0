@@ -5,13 +5,13 @@ info:
   description: |
     An API for device authentication handling. Intended for use by devices.
 
-basePath: '/api/devices/v1/authentication'
+basePath: '/api/devices/v1'
 host: 'docker.mender.io'
 schemes:
   - https
 
 paths:
-  /auth_requests:
+  /authentication/auth_requests:
     post:
       summary: Submit an authentication request
       description: |
@@ -81,6 +81,44 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /devices/{device_id}:
+    post:
+      summary: Submit the reason for device disconnection.
+      description: |
+        Device may not be able to send the heartbeat for every period of interver
+        set. When the device regains the ability to contact the server, it will share
+        the reason for not being able to connect the server.
+
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          format: Bearer [token]
+          description: Contains the JWT token issued by the Device Authentication Service.
+        - name: device_id
+          type: string
+          in: path
+          description: Device ID of the device.
+          required: true
+        - name: state
+          in: body
+          description: Reason for the disconnection.
+          required: true
+          schema:
+            $ref: "#/definitions/State"
+      responses:
+        204:
+          description:  successfully updated.
+        400:
+          description: Missing or malformed request params or body. See the error message for details.
+          schema:
+            $ref: '#/definitions/Error'
+        500:
+          description: Internal server error.
+          schema:
+            $ref: '#/definitions/Error'
+
 definitions:
   AuthRequest:
     type: object
@@ -101,6 +139,25 @@ definitions:
       application/json:
         id_data: "{\"mac\":\"00:01:02:03:04:05\"}"
         pubkey: "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzogVU7RGDilbsoUt/DdH\nVJvcepl0A5+xzGQ50cq1VE/Dyyy8Zp0jzRXCnnu9nu395mAFSZGotZVr+sWEpO3c\nyC3VmXdBZmXmQdZqbdD/GuixJOYfqta2ytbIUPRXFN7/I7sgzxnXWBYXYmObYvdP\nokP0mQanY+WKxp7Q16pt1RoqoAd0kmV39g13rFl35muSHbSBoAW3GBF3gO+mF5Ty\n1ddp/XcgLOsmvNNjY+2HOD5F/RX0fs07mWnbD7x+xz7KEKjF+H7ZpkqCwmwCXaf0\niyYyh1852rti3Afw4mDxuVSD7sd9ggvYMc0QHIpQNkD4YWOhNiE1AB0zH57VbUYG\nUwIDAQAB\n-----END PUBLIC KEY-----\n"
+  State:
+    type: object
+    required:
+      - state
+    properties:
+      state:
+        type: string
+        description: |
+          state values
+          1 (dont use with API) being used for inventory update)
+          2 NW issued
+          3 Reboot
+      UUID:
+        type: string
+        description: UUID assigned for the device
+    example:
+      application/json:
+        state : 3
+        UUID : 5e1d56a5de330c0001792ae6
   Error:
     description: Error descriptor.
     type: object
