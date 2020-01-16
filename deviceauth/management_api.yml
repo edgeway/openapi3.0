@@ -49,6 +49,15 @@ paths:
           format: integer
           default: 20
           maximum: 500
+        - name: UUID
+          in: query
+          description: |
+            Sorting parameter, here sort by UUID
+          required: false
+          type: boolean
+          enum:
+            - true
+            - false
       responses:
         200:
           description: An array of devices.
