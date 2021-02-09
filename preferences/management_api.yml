@@ -89,6 +89,7 @@ paths:
   /server/{id}:
     description: Getting information or sending for particular server
     get:
+      description: Getting information or sending for particular server
       security:
         - bearerAuth: []
       description: get server information from ID
@@ -172,6 +173,7 @@ paths:
   /servers/attributes:
     description: get particular server atributes
     get:
+      description: get particular server atributes
       parameters:
         - in: query
           name: type
