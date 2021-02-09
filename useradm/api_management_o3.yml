@@ -42,6 +42,7 @@ paths:
   /verify:
     description: Verify link sent on mail of user
     get:
+      summary: Authenticate the mail User
       description: Authenticate the URL
       parameters:
         - name: email
@@ -77,6 +78,7 @@ paths:
   /reset:
     description: reset the password of user
     post:
+      summary: reset the user password
       requestBody:
         description: password reset payload
         content:
@@ -104,6 +106,7 @@ paths:
   /users/{id}/role:
     description: get the role by id
     get:
+      summary: get the role (admin/viewer) by user ID
       parameters:
         - name: id
           in: path
