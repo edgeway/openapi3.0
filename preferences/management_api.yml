@@ -92,7 +92,6 @@ paths:
       description: Getting information or sending for particular server
       security:
         - bearerAuth: []
-      description: get server information from ID
       parameters:
         - in: path
           name: id
