@@ -76,6 +76,7 @@ paths:
   /api/management/v1/vcamlogic/devices/{did}/vcams/commands:
     description: update vcam device commands
     put:
+      description: update vcam device commands
       parameters:
         - in: path
           name: did
@@ -104,8 +105,9 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/management/v1/vcamlogic/devices/{did}:
-    description: get device
+    description: get device by device ID
     get:
+      description: get device by device ID
       parameters:
         - in: path
           name: did
@@ -130,6 +132,7 @@ paths:
   /api/management/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}:
     description: update and get device camera slots.
     put:
+      description: update and get device camera slots.
       parameters:
         - in: path
           name: did
@@ -150,6 +153,7 @@ paths:
         201:
           description: Success to update the camera slots.
     get:
+      description: get camera for device by deviceID, mac and index.
       parameters:
         - in: path
           name: did
