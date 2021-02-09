@@ -1,0 +1,286 @@
+openapi: '3.0.0'
+
+info:
+  version: '1.0.0'
+  title: infra-manager management API
+
+servers:
+  - url: '{protocol}://trial.edgeway.io/{basePath}'
+    variables:
+      protocol:
+        enum: [http, https]
+        default: https
+      basePath: 
+        enum: [/api/management/v1/infra_manager/infra]
+        default: /api/management/v1/infra_manager/infra
+
+paths:
+  /:
+    post:
+      description: create infrastructure request
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/createInfra'
+      responses:
+          201:
+            description: creating infrastures
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+    get:
+      description: get infrastructure request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: per_page
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: array of infrastructurs
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresArray'
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+  /{id}:
+    get:
+      description: get infrastructure request
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: array of infrastructurs
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresObj'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorGetInfra'
+          500:
+            description: Unexpected error
+    put:
+      description: update infrastructure by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/updateInfraObj'
+      responses:
+          201:
+            description: infrastructurs respose
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorGetInfra'
+          500:
+            description: Unexpected error
+    delete:
+      description: delete infrastructure by id
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: delete infrastructurs respose
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+  /servers/count:
+    get:
+      description: get infrastructures count
+      security:
+        - bearerAuth: []
+      responses:
+          201:
+            description: count infrastructurs object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/countObj'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+  /instance/{id}:
+    get:
+      description: get infrastructure by instace ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: infrastructurs response object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresObj'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresObj'
+          500:
+            description: Unexpected error
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      description: Error descriptor
+      type: object
+      properties:
+        error:
+          description: Description of the error
+          type: string
+    ErrorGetInfra:
+      description: Error descriptor
+      type: object
+      properties:
+        error:
+          description: Description of the error
+          type: string
+        request_id:
+          type: string
+    onvifRtspPortRange:
+      description: onvif port ranges object
+      type: object
+      properties:
+        start:
+          type: number
+        end:
+          type: number
+    createInfra:
+      description: create infrastructure
+      type: object
+      properties:
+        name:
+          type: string
+        instance_id:
+          type: string
+        public_ip:
+          type: string
+        onvif_port_range:
+          type: object
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          type: object
+          $ref: '#/components/schemas/onvifRtspPortRange'
+    getInfraStructuresObj:
+      description: get infrastructure object
+      type: object
+      properties:
+        name:
+          type: string
+        instance_id:
+          type: string
+        public_ip:
+          type: string
+        onvif_port_range:
+          type: object
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          type: object
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    getInfraStructuresArray:
+      description: getting list of ifrastructures array
+      type: array
+      items:
+        $ref: '#/components/schemas/getInfraStructuresObj'
+    updateInfraObj:
+      description: update infrastructure by ID
+      type: object
+      properties:
+        onvif_port_range:
+            type: object
+            $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          type: object
+          $ref: '#/components/schemas/onvifRtspPortRange'
+    countObj:
+      description: count object
+      type: object
+      properties:
+        count:
+          type: number
+
