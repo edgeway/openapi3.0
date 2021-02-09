@@ -1,0 +1,859 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Configurations API'
+  description: 'APIs for Managing configurations service. APIs for flavors, configurations and  configurations map. Server to send configuration map to a device. '
+  contact:
+    name: Prabhu Chawandi
+    url: smardtv.com
+    email: prabhu.chawandi@smardtv.com
+    
+servers:
+  - url: https://smarthing-cloud-dev.com
+    description: Dev Server
+  
+  - url: http://smarthing-cloud.com
+    description: Prod Server
+
+  
+paths: 
+  /api/devices/v1/configurations/config_requests/{deviceId}:
+    get:
+      summary: Device API to get the configuration and flavor for the deviceId
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          description: Device Id of chosen device.
+          schema:
+            type: string
+      responses:
+        200:
+          description: configuration map
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigMap'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The device is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/configurations/configs/list:
+    post:
+      summary: API to create new configuration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+      
+      responses:
+        200:
+          description: Created configuration
+
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      summary: Management API to list configurations
+      responses:
+        200:
+          description: list of configurations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfConfigs'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      
+  /api/management/v1/configurations/configs/{configId}:
+    get:
+      summary: get configuration by ID
+      parameters: 
+        - in: path
+          name: configId
+          required: true
+          description: configuration ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: configuration object retured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      description: Update the configuration
+      parameters: 
+        - in: path
+          name: configId
+          required: true
+          description: configuration ID
+          schema:
+            type: string
+            
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+      responses:
+        200:
+          description: configuration object updated.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      
+    delete:
+      description: Delete the configuration
+      parameters: 
+        - in: path
+          name: configId
+          required: true
+          description: configuration ID
+          schema:
+            type: string
+            
+      responses:
+        200:
+          description: configuration object deleted.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/management/v1/configurations/configs/list/count:
+    get:
+      summary: get the count of configurtions
+      responses:
+        200:
+          description: configurations count.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    description: number of entries in db
+                    type: integer
+                example: 
+                  count: 5
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+  /api/management/v1/configurations/configs/list/type/{type}:   
+    get:
+      summary: get configurations list by type
+      parameters:
+        - in: path
+          name: type
+          description: type of the configuration
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: array of configuration object retured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfConfigs'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/configurations/flavors/list:
+    post:
+      summary: API to create new configuration flavor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Flavor'
+      
+      responses:
+        200:
+          description: Created configuration flvavor
+
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      summary: Management API to list configuration flavor
+      description: API called by GUI to get the list of configurations flavors.
+      responses:
+        200:
+          description: list of configuration flavors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfFlavors'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      
+  /api/management/v1/configurations/flavors/{flavorId}:
+    get:
+      summary: get configuration flavor by ID
+      parameters: 
+        - in: path
+          name: flavorId
+          required: true
+          description: configuration flavor ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: configuration flavor object retured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Flavor'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      description: Update the configuration flaovr
+      parameters: 
+        - in: path
+          name: flavorId
+          required: true
+          description: configuration flavor ID
+          schema:
+            type: string
+            
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Flavor'
+      responses:
+        200:
+          description: configuration flavor object updated.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      
+    delete:
+      description: delete the configuration flavor
+      parameters: 
+        - in: path
+          name: flavorId
+          required: true
+          description: configuration flavor ID
+          schema:
+            type: string
+            
+      responses:
+        200:
+          description: configuration flavor object deleted.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /api/management/v1/configurations/flavors/list/count:
+    get:
+      summary: get the count of configurtion flavors
+      responses:
+        200:
+          description: configuration flavors count.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    description: number of entries in db
+                    type: integer
+                example: 
+                  count: 5
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+  /api/management/v1/configurations/flavors/list/type/{type}:   
+    get:
+      summary: get configuration flavors list by type
+      parameters:
+        - in: path
+          name: type
+          description: type of the configuration flavor
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: array of configuration flavor object retured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfFlavors'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/configurations/configmaps/{deviceId}:
+    get:
+      summary: Management API to get the configuration and flavor map for the deviceId
+      description: GUI API to get configuration map for the device chosen device Id
+        
+      parameters:
+        - name: deviceId
+          required: true
+          in: path
+          description: Device Id of chosen device.
+          schema:
+            type: string
+      responses:
+        200:
+          description: configuration map
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConfigMap'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/configurations/configmaps/list:   
+    get:
+      summary: get configurations & flavors map list
+      responses:
+        200:
+          description: array of configuration map object retured.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfConfigmaps'
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/configurations/configmaps/device/{id}:
+    put:
+      description: update configuration map by device id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: configuration flavor ID
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Flavor'
+      responses:
+        201:
+          description: configuration updated.
+        404:
+          description: Status Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  responses:
+    UnauthorizedError:
+      description: Access token in missing or invalid
+ 
+  schemas:
+  
+    Error:
+      description: Error descriptor.
+      type: object
+      properties:
+        error:
+          description: Description of the error.
+          type: string
+        request_id:
+          description: Request ID (same as in X-MEN-RequestID header).
+          type: string
+      example:
+        error: "failed to decode device group data: JSON payload is empty"
+        request_id: "f7881e82-0492-49fb-b459-795654e7188a"
+
+    Config:
+      description: configurations for the device
+      type: object
+      properties:
+        id:
+          description: DB assigned ID
+          type: string
+        refs:
+          description: reference count for this config
+          type: integer 
+        config_details:
+          description: JSON string of configurations
+          type: string
+        name:
+          description: name of the configuration
+          type: string
+        type:
+          description: type of the configuration
+          type: string
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
+      example:
+        config_details: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
+        created_ts: "2019-04-24T10:41:05.746Z"
+        id: "5cc03d4149c556000134fc5e"
+        name: "VSAAS_TestP"
+        refs: 0
+        type: "VSAAS"
+        updated_ts: "2019-04-24T10:41:05.746Z"
+        
+    ArrayOfConfigs:
+      description: array of configurations
+      type: array
+      items:
+        $ref: '#/components/schemas/Config'
+
+    ArrayOfFlavors:
+      description: array of configuration flavors
+      type: array
+      items:
+        $ref: '#/components/schemas/Flavor'
+
+    Flavor:
+      description: configuration flavor for the device
+      type: object
+      properties:
+        id:
+          description: DB assigned ID
+          type: string
+        refs:
+          description: reference count for this config
+          type: integer 
+        container:
+          description: JSON string of container details
+          type: string
+        name:
+          description: name of the configuration
+          type: string
+        type:
+          description: type of the configuration
+          type: string
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
+      example:
+        conatainer: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
+        created_ts: "2019-04-24T10:41:05.746Z"
+        id: "5cc03d4149c556000134fc5e"
+        name: "VSAAS_TestP"
+        refs: 0
+        type: "VSAAS"
+        updated_ts: "2019-04-24T10:41:05.746Z"
+       
+    ConfigMap:
+      description: Device configurations map
+      type: object
+      properties:
+        configuration:
+          type: object
+          properties:
+            config_details:
+              description: JSON string of configurations
+              type: string
+            name:
+              description: name of the configuration
+              type: string
+            type:
+              description: type of the configuration
+        device_id:
+          description: device id under question
+          type: string
+        flavor:
+          description: flavor mapped to device
+          type: object
+          properties:
+            container:
+              description: JSON string of container details
+              type: string
+            name:
+              description: name of configuration flavor
+              type: string
+            type:
+              description: type of the cofiguration flavor
+              type: string
+        unique_dev_parameters:
+          description: Unique device parameters associated ex. comments
+          type: string
+      example:
+        configuration: 
+           config_details: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
+           name: "VSASS_Test2"
+           type: "VSAAS"
+          
+        device_id: "5ca5c7352d740400018a214e"
+        flavor: 
+          container: "{ \"protection_type\" : \"LinkProt\", \"key_rotation_period\" : \"15\", \"key_predelivery_win\" : \"1\", \"cam_net_if\" : \"eth0\", \"cam_onvif_port\" : \"92\", \"cam_rtsp_port\" : \"990\", \"cam_addr\" : \"9900\", \"cam_port\" : \"121\" }"
+          name: "VSAAS"
+          type: "VSAAS"
+        unique_devparams: "testUniqueParams"
+
+    ArrayOfConfigmaps:
+      description: array of configurations - flavors map
+      type: array
+      items:
+        $ref: '#/components/schemas/ConfigMap'
+    
+    DevConfigMapUpdate:
+      description: config map update
+      type: object
+      properties:
+        config_id:
+          description: config id
+          type: string
+        configflvr_id:
+          description: configuration flavor id
+          type: string
+        config_name:
+          description: name of configuration flavor
+          type: string
+        flavor_name:
+          description: flavour name
+          type: string
+        unique_devparams:
+          description: unique params
+          type: string
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
+        ai_packages:
+          type: object
+          $ref: '#/components/schemas/AiPackage'
+
+    AiPackage:
+      description: ai package struct
+      type: object
+      properties:
+        name:
+          description: name
+          type: string
+        package_id:
+          description: package id
+          type: string
