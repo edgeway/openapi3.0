@@ -168,6 +168,39 @@ paths:
         500:
           $ref: "#/responses/InternalServerError"
 
+  /device/artifacts/{id}/download:
+    get:
+      summary: Get the download link of a selected artifact
+      description: |
+        Generates signed URL for downloading artifact file. URI can be used only
+        with GET HTTP method. Link supports such HTTP headers: 'Range',
+        'If-Modified-Since', 'If-Unmodified-Since' It is valid for specified
+        period of time.
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          type: string
+          format: Bearer [token]
+          description: Contains the JWT token issued by the User Administration and Authentication Service.
+        - name: id
+          in: path
+          description: Artifact identifier.
+          required: true
+          type: string
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Successful response.
+          schema:
+            $ref: "#/definitions/ArtifactLink"
+        400:
+          $ref: "#/responses/InvalidRequestError"
+        404:
+          $ref: "#/responses/NotFoundError"
+        500:
+          $ref: "#/responses/InternalServerError"
 definitions:
   Error:
     description: Error descriptor.
@@ -259,3 +292,20 @@ definitions:
           - timestamp: 2016-03-11T13:03:18.023765782Z
             level: DEBUG
             message: successfully updated.
+
+  ArtifactLink:
+    description: URL for artifact file download.
+    type: object
+    properties:
+      uri:
+        type: string
+      expire:
+        type: string
+        format: date-time
+    required:
+      - uri
+      - expire
+    example:
+      application/json:
+        uri: http://mender.io/artifact.tar.gz.mender
+        expire: 2016-10-29T10:45:34Z
