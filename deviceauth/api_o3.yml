@@ -1,0 +1,505 @@
+openapi: 3.0.0
+info:
+  title: Deviceauth intenal management API
+  description: An API managing device auth.
+  contact:
+    name: Dhruvit Patel
+    url: smardtv.com
+  version: 1.0.0
+servers:
+- url: https://smarthing-cloud-dev.com
+  description: Dev Server
+- url: https://smarthing-cloud.com
+  description: Prod Server
+
+paths:
+  /api/internal/v1/devauth/tenant/{id}/limits/{name}:
+    put:
+      summary: update the device action from device.
+      parameters:
+      - name: id
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: name
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: device action is updated.
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: create default the device action.
+      parameters:
+      - name: id
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: name
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: device action is updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device_Action'
+        404:
+          description: status not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v1/devauth/tenants/{tid}/devices/{did}:
+    description: Delete tenant device by device id
+    delete:
+      description: Delete tenant device by device id
+      parameters:
+        - name: tid
+          in: path
+          description: Tenant identifier.
+          required: true
+          schema:
+            type: string
+        - name: did
+          in: path
+          description: Device identifier.
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: device is deleted.
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v2/devauth/devices:
+    description: post devices list
+    post:
+      description: post devices list
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/preAuthReq'
+      responses:
+        201:
+          description: devices added.
+        400:
+          description: Missing/malformed request parameters or body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: conflict devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v2/devauth/serviceinfo:
+    description: get service information
+    get:
+      description: get service information
+      responses:
+        200:
+          description: A list of local configurations.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectInfo'
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v2/devauth/devices/search:
+    description: get device list by querying field and input
+    get:
+      description: get device list by querying field and input
+      parameters:
+        - in: query
+          name: field
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: input
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: A list of device UUID search by field and input.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UUIDList'
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: The user is not authenticated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v2/devauth/limits/{name}:
+    description: get limits by name
+    get:
+      description: get limits by name
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: success to get the limit.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitValue'
+        400:
+          description: Missing/malformed request parameters or body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v2/devauth/devices/{id}/auth/{aid}/status:
+    get:
+      description: get auth set status
+      parameters:
+        - name: id
+          in: path
+          description: Device identifier.
+          required: true
+          schema:
+            type: string
+        - name: aid
+          in: path
+          description: Authentication data set identifier.
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: success to get the authentication status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        404:
+          description: The device was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: Request cannot be fulfilled e.g. due to exceeded limit on maximum accepted devices (see error message).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      description: update device auth by device ID
+      parameters:
+        - name: id
+          in: path
+          description: Device identifier.
+          required: true
+          schema:
+            type: string
+        - name: aid
+          in: path
+          description: Authentication data set identifier.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevAuthApiStatus'
+      responses:
+        204:
+          description: The device authentication data set status was successfully updated.
+        400:
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: The device was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: Request cannot be fulfilled e.g. due to exceeded limit on maximum accepted devices (see error message).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    action:
+      type: object
+      properties:
+        config_details:
+          type: string
+          description: JSON string with device action details
+        device_id:
+          type: string
+          description: device id for which action has triggerd
+        id:
+          type: string
+          description: db assigned id
+        created_ts:
+          type: string
+          description: Created timestamp
+          format: datetime
+        updated_ts:
+          type: string
+          description: Updated timestamp
+          format: datetime
+      description: device action model
+      example:
+        actions: '{"Reboot":"true", "reset":"true", "uart":"true","open_port":"80"}'
+        created_ts: 2019-04-16T06:44:16.386Z
+        device_id: "1"
+        env_vars: '{"config_poll_interval":"2", "flavor_poll_interval":"2","actions_poll_interval":"2"}'
+        id: 5cb579c066b19200019d546f
+        updated_ts: 2019-04-16T06:44:16.386Z
+    ArrayOfActions:
+      type: array
+      description: array of local configurations
+      items:
+        $ref: '#/components/schemas/action'
+
+    Device_Params:
+      type: object
+      description: device param status and details
+      properties:
+        status:
+          type: integer
+        details:
+          type: string
+
+    Device_Action:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/Device_Params'
+        env_vars:
+          $ref: '#/components/schemas/Device_Params'
+        enablers:
+          $ref: '#/components/schemas/Device_Params'
+
+    preAuthReq:
+      type: object
+      properties:
+        identity_data:
+          description: sent by device map[string]interface{}
+          type: string
+        pubkey:
+          type: string
+        type:
+          description: flavour type
+          type: string
+        config_name:
+          type: string
+        flavor_name:
+          type: string
+        unique_devparams:
+          type: string
+      example:
+        identity_data: '1:{"UUID":"fa9410d3-b2dc-49ef-a050-346499d134c4"},2:{"UUID":"fa9410d3-b2dc-49ef-a050-346499d134c5"}'
+        pubkey: 'aaaaaaaaaabddblfuisbdlibqrugiluig'
+        type: 'tenant'
+        config_name: 'abc'
+        flavour_name: 'abc'
+        unique_devparams: ''
+
+    ProjectInfo:
+      type: object
+      properties:
+        project_name:
+          type: string
+        project_version:
+          type: string
+        sub_projects:
+          type: array
+          items:
+            properties:
+              name:
+                type: string
+              git_hash:
+                type: string
+
+    UUIDList:
+      type: array
+      items:
+        properties:
+          uuid_list:
+            type: string
+
+    DevAuthApiStatus:
+      type: object
+      properties:
+        status:
+          type: string
+        type:
+          type: string
+          description: flavour type
+        config_name:
+          type: string
+        flavor_name:
+          type: string
+        unique_devparams:
+          type: string
+
+    Status:
+      type: object
+      properties:
+        status:
+          type: string
+
+    LimitValue:
+      type: object
+      properties:
+        limit:
+          type: string
+
+  responses:
+    UnauthorizedError:
+      description: Access token in missing or invalid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
