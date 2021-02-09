@@ -1,0 +1,367 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'vcamlogic Management APIs'
+  description: 'API for managing  virtual camera logic'
+  contact:
+    name: Dhruvit Patel
+    url: smardtv.com
+
+servers:
+  - url: https://smarthing-cloud-dev.com
+    description: Dev Server
+
+  - url: https://smarthing-cloud.com
+    description: Prod Server
+
+paths:
+  /api/management/v1/vcamlogic/devices:
+    get:
+      description: |
+        Get device list.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success to get the devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayDevice'
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      description: update devices
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VCamsUpdate'
+      responses:
+        201:
+          description: Success to update devices.
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/devices/{did}/vcams/commands:
+    description: update vcam device commands
+    put:
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VcamCommands'
+      responses:
+        201:
+          description: Success to update device commands.
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/devices/{did}:
+    description: get device
+    get:
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success to get device.
+                       And also on no device found by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getDevice'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}:
+    description: update and get device camera slots.
+    put:
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: mac
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: idx
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Success to update the camera slots.
+    get:
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: mac
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: idx
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success to get the device camera slots.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Camera'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Error:
+      description: Error descriptor.
+      type: object
+      properties:
+        error:
+          description: Description of the error.
+          type: string
+      example:
+        application/json:
+          error: "missing Authorization header"
+
+    Camera:
+      description: camera struct
+      type: object
+      properties:
+        slot_index:
+          type: integer
+        uuid:
+          type: string
+        mac:
+          type: string
+        user_name:
+          type: string
+        password:
+          type: string
+        public_ip:
+          type: string
+        cameraTestedStatus:
+          type: integer
+        onvif_port:
+          type: integer
+        onvif_url:
+          type: string
+        rtsp_port:
+          type: integer
+        rtsp_url:
+          type: string
+        rtsp_channels:
+          type: string
+        cameraNvrRecRtspPreferred:
+          type: string
+        cameraAnalyzeRtspPreferred:
+          type: string
+        info:
+          type: string
+
+    ActiveCamera:
+      description: active cameras
+      properties:
+        slot_index:
+          type: string
+        mac:
+          type: string
+        partof:
+          type: string
+
+    Device:
+      description: device struct
+      type: object
+      properties:
+        id:
+          type: string
+        device_id:
+          type: string
+        device_uuid:
+          type: string
+        device_mac:
+          type: string
+        slot_configuration:
+          type: array
+          items:
+            $ref: '#/components/schemas/Camera'
+        slots:
+          type: object
+          properties:
+            string:
+              type: array
+              items:
+                properties:
+                  string:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Camera'
+        slot_index:
+          type: string
+        active_cams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActiveCamera'
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    ArrayDevice:
+      description: array of devices
+      type: array
+      items:
+        $ref: '#/components/schemas/Device'
+
+    error:
+      description: vcam status error
+      type: object
+      properties:
+        state:
+          type: string
+        msg:
+          type: string
+
+    info:
+      description: vcam info
+      type: object
+      properties:
+        slotIndex:
+          type: integer
+        uptime:
+          type: integer
+        restartCount:
+          type: integer
+        type:
+          type: string
+        command:
+          type: string
+        status:
+          type: string
+        error:
+          type: object
+          $ref: '#/components/schemas/error'
+
+    vcams:
+      description: vcam devices
+      type: object
+      properties:
+        deviceId:
+          type: string
+        mac:
+          type: string
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/info'
+
+    VCamsUpdate:
+      description: array vcam device update
+      type: object
+      properties:
+        vcams:
+          type: array
+          items:
+            $ref: '#/components/schemas/vcams'
+
+    VcamCommands:
+      description: vcam commands
+      type: object
+      properties:
+        command:
+          type: string
+        command_type:
+          type: string
+        vcams:
+          type: array
+          items:
+            properties:
+              mac:
+                type: string
+              slotIndex:
+                type: integer
+              port:
+                type: string
+
+    getDevice:
+      description: device info
+      type: object
+      properties:
+        deviceId:
+          type: string
+        deviceMAC:
+          type: string
+        UUID:
+          type: string
+        vcams:
+          type: array
+          items:
+            $ref: '#/components/schemas/vcams'
