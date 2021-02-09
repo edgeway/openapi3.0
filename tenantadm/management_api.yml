@@ -1,0 +1,711 @@
+openapi: '3.0.0'
+
+info:
+  version: '1.0.0'
+  title: tenantadm management API
+
+servers:
+  - url: '{protocol}://trial.edgeway.io/{basePath}'
+    variables:
+      protocol:
+        enum: [http, https]
+        default: https
+      basePath: 
+        enum: [/api/management/v1/tenantadm]
+        default: /api/management/v1/tenantadm
+
+paths:
+  /tenants:
+    get:
+      summary: Get list of tanents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Results page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          description: Number of results per page
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 500
+      responses:
+        200:
+          description: An array of devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayofTanent'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      description: Adding new tanent
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: create server object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tenant'
+      responses:
+        200:
+          description: An array of devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+  /tenants/count:
+    get:
+      summary: get the number of tanent
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: An object for tanent count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tanentCountObj'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+  /tanents/{id}:
+    put:
+      summary: update tanent
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+      requestBody:
+        description: update tanent
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantUpdate'
+      responses:
+        204:
+          description: succes to update tanent
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: delete tanent
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+      responses:
+        204:
+          description: succes to delete tanent
+        404:
+          description: tanent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user/tenant:
+    get:
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: An object for tanent count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tenants/{id}/users:
+    post:
+      description: create tanent user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+      requestBody:
+        description: user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantUser'
+      responses:
+        201:
+          description: user created
+        400:
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      description: get list of users of tanent
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+      responses:
+        201:
+          description: array of tanent user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayTenantUser'
+        400:
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: status not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tdmap:
+    post:
+      description: create tanent device map
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: device map
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantDeviceMap'
+      responses:
+        201:
+          description: device maps for given tenant
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDeviceMap'
+        400:
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: status not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tdmap/devices/{uuid}:
+    put:
+      description: update tanent device map by UUID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        201:
+          description: updated device maps for given UUID
+        400:
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: status not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      description: Add single tanent device map by UUID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: device maps updated
+        400:
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: status not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /tdmap/{id}:
+    put:
+      description: update single tenant device map
+      security:
+          - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantDeviceMapUpdate'
+      responses:
+          201:
+            description: device maps updated
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+      description: delete single tenant device map
+      security:
+          - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: device maps deleted
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /mapcount:
+    get:
+      description: get tenant device map count
+      security:
+          - bearerAuth: []
+      responses:
+          201:
+            description: get device maps
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/tanentCountObj'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /map:
+    post:
+      security:
+        - bearerAuth: []
+      summary: create tanent device map
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/fileContent'
+      responses:
+          201:
+            description: device maps updated
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    get:
+      security:
+        - bearerAuth: []
+      summary: create tanent device map
+      parameters:
+        - name: page
+          in: query
+          description: Results page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          description: Number of results per page
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 500
+      responses:
+          201:
+            description: device maps list /need to check
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ArrayTenantDeviceMap'
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      description: Error descriptor
+      type: object
+      properties:
+        error:
+          description: Description of the error
+          type: string
+    tanentCountObj:
+      description: tanentn count object
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int64
+    tanentArrayUser:
+      description: get all tanents users
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    updateTenant:
+      description: update tanent status
+      type: object
+      properties:
+        status:
+          type: string
+    createTenant:
+      description: create tanent struct
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+
+    deviceMapRes:
+      description: device map responce on success
+      type: object
+      properties:
+        id:
+          type: string
+        UUID:
+          type: string
+        public_key:
+          type: string
+        Tenant:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    fileContent:
+      description: device map file conetent
+      type: object
+      properties:
+        filename:
+          type: array
+          items:
+            type: string
+            format: binary
+    Tenant:
+      description: tenant struct
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        plan:
+          type: string
+        tenant_token:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    ArrayofTanent:
+      description: array of tenant
+      type: array
+      items:
+        $ref: '#/components/schemas/Tenant'
+    TenantUpdate:
+      description: tenant update
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+        plan:
+          type: string
+        tenant_token:
+          type: string
+        updated_ts:
+          type: string
+    TenantUser:
+      description: tanent adm user struct
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    ArrayTenantUser:
+      description: array of tanents user
+      type: array
+      items:
+          $ref: '#/components/schemas/TenantUser'
+
+    TenantDeviceMap:
+      description: create tanent device map struct
+      type: object
+      properties:
+        id:
+          type: string
+        UUID:
+          type: string
+        public_key:
+          type: string
+        Tenant:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    ArrayTenantDeviceMap:
+      description: array of tanents device map
+      type: array
+      items:
+          $ref: '#/components/schemas/TenantDeviceMap'
+
+    TenantDeviceMapUpdate:
+      description: tenant device map update
+      properties:
+        Tenant:
+          type: string
+        updated_ts:
+            type: string
+
+    UserUpdate:
+      description: user update
+      type: object
+      properties:
+        name:
+          type: string
+        updated_ts:
+          type: string
