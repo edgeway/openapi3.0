@@ -179,6 +179,7 @@ paths:
                 $ref: '#/components/schemas/Error'
   /user/tenant:
     get:
+      description: Get users of tenant.
       security:
         - bearerAuth: []
       responses:
