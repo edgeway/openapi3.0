@@ -1,12 +1,11 @@
 openapi: 3.0.0
 info:
-  title: Action device management API
+  title: Action Device API
   description: An API for managing device action. For each device actions status store
     inside server database. Set Action for device from GUI, device is responsible
     to reset it after performing action.
   contact:
     name: Edgeway
-    url: smardtv.com
     email: devops.vep@smardtv.com
   version: 1.0.0
 servers:
