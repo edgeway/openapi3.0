@@ -1,15 +1,14 @@
 openapi: 3.0.0
 info:
-  title: Device action API
+  title: Action device management API
   description: An API for managing device action. For each device actions status store
     inside server database. Set Action for device from GUI, device is responsible
     to reset it after performing action.
   contact:
-    name: Alap vyas
+    name: Edgeway
     url: smardtv.com
-    email: alap.vyas@smardtv.com
+    email: devops.vep@smardtv.com
   version: 1.0.0
-
 servers:
 - url: https://smarthing-cloud-dev.com
   description: Dev Server
@@ -17,9 +16,11 @@ servers:
   description: Prod Server
 
 paths:
-  /api/devices/v1/action/{deviceId}:
+  /api/device/v1/action/{deviceId}:
     put:
       summary: update the device action from device.
+      security:
+      - bearerAuth: []
       parameters:
       - name: deviceId
         in: path
@@ -51,8 +52,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  
+    post:
+      summary: create default the device action.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: deviceId
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: device action is updated.
+        400:
+          description: Missing/malformed request parameters or body. See error for
+            details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: create default the device action.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: deviceId
+        in: path
+        description: device id of device under question
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        200:
+          description: device action is updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device_Action'
+        404:
+          description: status not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Error:
       type: object
@@ -68,12 +136,25 @@ components:
         error: 'failed to decode device group data: JSON payload is empty'
         request_id: f7881e82-0492-49fb-b459-795654e7188a
 
+    Device_Params:
+      type: object
+      description: device param status and details
+      properties:
+        status:
+          type: integer
+        details:
+          type: string
+
+    Device_Action:
+      type: object
+      properties:
+        actions:
+          $ref: '#/components/schemas/Device_Params'
+        env_vars:
+          $ref: '#/components/schemas/Device_Params'
+        enablers:
+          $ref: '#/components/schemas/Device_Params'
+
   responses:
     UnauthorizedError:
       description: Access token in missing or invalid
-      
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
