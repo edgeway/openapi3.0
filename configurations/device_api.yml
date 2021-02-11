@@ -1,18 +1,17 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'Configurations API'
-  description: 'APIs for Managing configurations service. APIs for flavors, configurations and  configurations map. Server to send configuration map to a device. '
+  title: 'Configurations Device API'
+  description: 'APIs for requesting configurations and flavour for a Device.'
   contact:
-    name: Prabhu Chawandi
-    url: smardtv.com
-    email: prabhu.chawandi@smardtv.com
-    
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
 servers:
-  - url: https://smarthing-cloud-dev.com
+  - url: https://ewm-preprod.edgeway.io
     description: Dev Server
   
-  - url: http://smarthing-cloud.com
+  - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
   
@@ -20,6 +19,8 @@ paths:
   /api/devices/v1/configurations/config_requests/{deviceId}:
     get:
       summary: Device API to get the configuration and flavor for the deviceId
+      security:
+      - bearerAuth: []
       parameters:
         - name: deviceId
           required: true
@@ -60,13 +61,8 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  
-  responses:
-    UnauthorizedError:
-      description: Access token in missing or invalid
- 
+
   schemas:
-  
     Error:
       description: Error descriptor.
       type: object
@@ -78,9 +74,9 @@ components:
           description: Request ID (same as in X-MEN-RequestID header).
           type: string
       example:
-        error: "failed to decode device group data: JSON payload is empty"
+        error: "Error string"
         request_id: "f7881e82-0492-49fb-b459-795654e7188a"
-       
+
     ConfigMap:
       description: Device configurations map
       type: object
@@ -127,9 +123,3 @@ components:
           name: "VSAAS"
           type: "VSAAS"
         unique_devparams: "testUniqueParams"
-
-    ArrayOfConfigmaps:
-      description: array of configurations - flavors map
-      type: array
-      items:
-        $ref: '#/components/schemas/ConfigMap'
