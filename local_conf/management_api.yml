@@ -1,24 +1,148 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'Local Confiugurations API'
-  description: 'API for managing  local configurations. For device to store a bulk of data inside server database. Device is responsible of creating/updating/deleting content of data. Data is unique by device'
+  title: 'Local Confiuguration Management API'
+  description: 'API for managing  local configurations.
+                For device to store a bulk of data inside server database.
+                Device is responsible of creating/updating/deleting content of data.
+                Data is unique by device'
   contact:
-    name: Prabhu Chawandi
-    url: smardtv.com
-    email: prabhu.chawandi@smartdtv.com
-    
-servers: 
-  - url: https://smarthing-cloud-dev.com
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-   
-  - url: https://smarthing-cloud.com
+  
+  - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
-paths: 
+paths:
+  /api/devices/v1/localconf/lconf_requests/{deviceId}:
+    patch: 
+        summary: Add the local configuration details for VSAAS flavor
+        description: Add the local configuration details for VSAAS flavor
+        parameters:
+         - name : deviceId
+           required: true
+           in: path
+           description: Device Id for which local configuration is added
+           schema:
+             type: string
+        
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lconf'
+
+        responses:
+          200:
+            description: Successfull addition of the local configuration
+          
+          400:
+            description: Missing/malformed request parameters or body. See error for details.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          401:
+            description: The device is not authenticated.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          500:
+            description: Internal error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+    post:
+      description: Add local configuration
+      summary: Add local configuration
+      parameters:
+        - in: path
+          name: deviceId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalConf'
+      responses:
+          200:
+            description: Successfull addition of the local configuration
+
+          400:
+            description: Missing/malformed request parameters or body. See error for details.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          401:
+            description: The device is not authenticated.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          500:
+            description: Internal error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/management/v1/localconf/lconf/list/{deviceId}:
+    post:
+      description: Add local configuration
+      summary: Add local configuration
+      parameters:
+        - in: path
+          name: deviceId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalConf'
+      responses:
+          200:
+            description: Successfull addition of the local configuration
+
+          400:
+            description: Missing/malformed request parameters or body. See error for details.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          401:
+            description: The device is not authenticated.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          500:
+            description: Internal error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
   /api/management/v1/localconf/lconf/list:
     get:
       summary: Get the list of local configurations.
+      description: Get the list of local configurations.
       parameters:
         - in: query
           name: page
@@ -63,7 +187,8 @@ paths:
 
   /api/management/v1/localconf/lconf/{deviceId}:
     get:
-      summary: get the local configuration of a device.
+      summary: Get the local configuration of a device.
+      description: Get the local configuration of a device.
       parameters: 
         - in: path
           name: deviceId
@@ -99,7 +224,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      summary: delete the local configuration of a device.
+      summary: Delete the local configuration of a device.
+      description: Delete the local configuration of a device.
       parameters: 
         - in: path
           name: deviceId
@@ -133,7 +259,8 @@ paths:
                 $ref: '#/components/schemas/Error'
                 
     put:
-      summary: update the local configuration of a device.
+      summary: Update the local configuration of a device.
+      description: Update the local configuration of a device.
       parameters: 
         - in: path
           name: deviceId
@@ -169,8 +296,8 @@ paths:
   
   /api/management/v1/localconf/lconf/list/count:
     get:
-      summary: get the count of local configurations.
-      
+      summary: Get the count of local configurations.
+      description: Get the count of local configurations.
       responses:
         200:
           description: local configurations count.
@@ -227,7 +354,7 @@ components:
           description: Request ID (same as in X-MEN-RequestID header).
           type: string
       example:
-        error: "failed to decode device group data: JSON payload is empty"
+        error: "Error string"
         request_id: "f7881e82-0492-49fb-b459-795654e7188a"
 
     Lconf:
@@ -263,3 +390,27 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Lconf'
+
+    LocalConf:
+      description: local configurations model
+      type: object
+      properties:
+        id:
+          description: db assigned id
+          type: string
+        device_id:
+          description: device id for which local configuration is created
+          type: string
+        uuid:
+          type: string
+        config_details:
+          description: JSON string with configurations details
+          type: string
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
