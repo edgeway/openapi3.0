@@ -9,16 +9,19 @@ info:
     name: Edgeway
     email: devops.vep@smardtv.com
   version: 1.0.0
+
 servers:
-- url: https://smarthing-cloud-dev.com
-  description: Dev Server
-- url: https://smarthing-cloud.com
-  description: Prod Server
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
 
 paths:
   /api/management/v1/action/{deviceId}:
     get:
-      summary: get the device action.
+      summary: Get the device action.
+      description: Get the device action.
       security:
       - bearerAuth: []
       parameters:
@@ -57,7 +60,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: update the device action.
+      summary: Update the device action.
+      description: Update the device action.
       security:
       - bearerAuth: []
       parameters:
@@ -92,7 +96,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      summary: delete the action of a device.
+      summary: Delete the action of a device.
+      description: Delete the action of a device.
       security:
       - bearerAuth: []
       parameters:
@@ -129,6 +134,7 @@ paths:
   /api/management/v1/action/list:
     get:
       summary: Get the list of device actions.
+      description: Get the list of device actions.
       security:
       - bearerAuth: []
       parameters:
@@ -193,9 +199,8 @@ components:
           description: Request ID (same as in X-MEN-RequestID header).
       description: Error descriptor.
       example:
-        application/json:
-          error: missing Authorization header
-          request_id: f7881e82-0492-49fb-b459-795654e7188a
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
 
     UserNew:
       required:
