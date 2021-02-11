@@ -19,7 +19,7 @@ servers:
     description: Prod Server
 
 paths:
-  /api/management/v1/tenantadm/tenants:
+  /api/internal/v1/tenantadm/tenants:
     get:
       summary: Get tenants
       description: Get tenants
@@ -89,7 +89,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v1/tenantadm/tenants/token/{uuid}:
+  /api/internal/v1/tenantadm/tenants/token/{uuid}:
     get:
       description: Get tenant token
       summary: Get tenant token
@@ -126,7 +126,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v1/tenantadm/users:
+  /api/internal/v1/tenantadm/users:
     post:
       description: Create user
       summary: Create user
@@ -164,7 +164,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /api/management/v1/tenantadm/tenants/{tid}/users/{uid}:
+  /api/internal/v1/tenantadm/tenants/{tid}/users/{uid}:
     put:
         description: Update user
         summary: Update user
@@ -251,7 +251,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /api/management/v1/tenantadm/tokens:
+  /api/internal/v1/tenantadm/tokens:
     delete:
       description: Delete token by token ID
       summary: Delete token by token ID
@@ -284,7 +284,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /api/management/v1/tenantadm/tdmap:
+  /api/internal/v1/tenantadm/tdmap:
     post:
       description: Add single tanent device map
       summary: Add single tanent device map
@@ -321,7 +321,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /api/management/v1/tenantadm/auth/verify:
+  /api/internal/v1/tenantadm/auth/verify:
     post:
       description: JWT token validation
       summary: JWT token validation
