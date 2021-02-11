@@ -308,7 +308,8 @@ paths:
 
   /api/internal/v1/devauth/tenant/{id}/limits/{name}:
     put:
-      summary: update the device action from device.
+      summary: Update the device action from device.
+      description: Update the device action from device.
       security:
       - bearerAuth: []
       parameters:
