@@ -1,0 +1,134 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'Infra-manager Internal API'
+  description: 'An internal api to get the infrastructure and create tenant.'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/internal/v1/infra/instance/{id}:
+    get:
+      description: Get infrastructure by instace ID
+      summary: Get infrastructure by instace ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: infrastructurs response object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresObj'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresObj'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/internal/v1/infra/infra/tenants:
+    post:
+      description: Create tanent internal post request
+      summary: Create tanent internal post request
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: create tenant object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/postTenant'
+      responses:
+        200:
+          description: provision tanent success
+        400:
+          description: Missing/malformed request params.
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    onvifRtspPortRange:
+      description: onvif port ranges object
+      type: object
+      properties:
+        start:
+          type: number
+        end:
+          type: number
+    getInfraStructuresObj:
+      description: get infrastructure object
+      type: object
+      properties:
+        name:
+          type: string
+        instance_id:
+          type: string
+        public_ip:
+          type: string
+        onvif_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    postTenant:
+      description: post object for tenant
+      type: object
+      properties:
+        tenant_id:
+          type: string
