@@ -8,16 +8,19 @@ info:
     name: Edgeway
     email: devops.vep@smardtv.com
   version: 1.0.0
+
 servers:
-- url: https://smarthing-cloud-dev.com
-  description: Dev Server
-- url: https://smarthing-cloud.com
-  description: Prod Server
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
 
 paths:
   /api/device/v1/action/{deviceId}:
     put:
-      summary: update the device action from device.
+      summary: Update the device action from device.
+      description: Update the device action from device.
       security:
       - bearerAuth: []
       parameters:
@@ -52,7 +55,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: create default the device action.
+      summary: Create default the device action.
+      description: Create default the device action.
       security:
       - bearerAuth: []
       parameters:
@@ -81,7 +85,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     get:
-      summary: create default the device action.
+      summary: Get device action.
+      description: Get device action.
       security:
       - bearerAuth: []
       parameters:
@@ -132,7 +137,7 @@ components:
           description: Request ID (same as in X-MEN-RequestID header).
       description: Error descriptor.
       example:
-        error: 'failed to decode device group data: JSON payload is empty'
+        error: 'Error string'
         request_id: f7881e82-0492-49fb-b459-795654e7188a
 
     Device_Params:
