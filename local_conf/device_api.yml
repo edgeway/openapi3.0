@@ -1,24 +1,29 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'Local Confiugurations API'
-  description: 'API for managing  local configurations. For device to store a bulk of data inside server database. Device is responsible of creating/updating/deleting content of data. Data is unique by device'
+  title: 'Local Confiuguration Device API'
+  description: 'API for managing  local configurations.
+                For device to store a bulk of data inside server database.
+                Device is responsible of creating/updating/deleting content of data.
+                Data is unique by device'
   contact:
-    name: Prabhu Chawandi
-    url: smardtv.com
-    email: prabhu.chawandi@smartdtv.com
-    
-servers: 
-  - url: https://smarthing-cloud-dev.com
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-   
-  - url: https://smarthing-cloud.com
+  
+  - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
 paths: 
   /api/devices/v1/localconf/lconf_requests/{deviceId}:
     patch: 
         summary: Add the local configuration details for VSAAS flavor
+        description: Add the local configuration details for VSAAS flavor
+        security:
+          - bearerAuth: []
         parameters:
          - name : deviceId
            required: true
@@ -37,6 +42,47 @@ paths:
           200:
             description: Successfull addition of the local configuration
           
+          400:
+            description: Missing/malformed request parameters or body. See error for details.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          401:
+            description: The device is not authenticated.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+          500:
+            description: Internal error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Add local configuration
+      description: Add local configuration
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: deviceId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalConf'
+      responses:
+          200:
+            description: Successfull addition of the local configuration
+
           400:
             description: Missing/malformed request parameters or body. See error for details.
             content:
@@ -80,7 +126,7 @@ components:
           description: Request ID (same as in X-MEN-RequestID header).
           type: string
       example:
-        error: "failed to decode device group data: JSON payload is empty"
+        error: "Error string"
         request_id: "f7881e82-0492-49fb-b459-795654e7188a"
 
     Lconf:
@@ -110,4 +156,27 @@ components:
        device_id: "5ca5a5e53654df850001145049"
        id: "5cb579c066b19200019d546f"
        updated_ts: "2019-04-16T06:44:16.386Z"
-   
+
+    LocalConf:
+      description: local configurations model
+      type: object
+      properties:
+        id:
+          description: db assigned id
+          type: string
+        device_id:
+          description: device id for which local configuration is created
+          type: string
+        uuid:
+          type: string
+        config_details:
+          description: JSON string with configurations details
+          type: string
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
