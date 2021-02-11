@@ -2,22 +2,27 @@ openapi: '3.0.0'
 
 info:
   version: '1.0.0'
-  title: tenantadm management API
+  title: 'Tenantadm Management API'
+  description: 'Management API used to call from UI to manage Tenants.
+                This will manage creation and deletion of Tenant.
+                Updating and deleting tenant device maps.
+                Additionally, to update and delete particular tenants and its devicemap'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
 
 servers:
-  - url: '{protocol}://trial.edgeway.io/{basePath}'
-    variables:
-      protocol:
-        enum: [http, https]
-        default: https
-      basePath: 
-        enum: [/api/management/v1/tenantadm]
-        default: /api/management/v1/tenantadm
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
 
 paths:
-  /tenants:
+  /api/management/v1/tenantadm/tenants:
     get:
       summary: Get list of tanents
+      description: Get list of tanents
       security:
         - bearerAuth: []
       parameters:
@@ -63,6 +68,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       description: Adding new tanent
+      summary: Adding new tanent
       security:
         - bearerAuth: []
       requestBody:
@@ -92,9 +98,10 @@ paths:
                 $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
-  /tenants/count:
+  /api/management/v1/tenantadm/tenants/count:
     get:
       summary: get the number of tanent
+      description: get the number of tanent
       security:
         - bearerAuth: []
       responses:
@@ -112,9 +119,10 @@ paths:
                 $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
-  /tanents/{id}:
+  /api/management/v1/tenantadm/tanents/{id}:
     put:
       summary: update tanent
+      description: update tanent
       security:
         - bearerAuth: []
       parameters:
@@ -152,6 +160,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
+      description: delete tanent
       summary: delete tanent
       security:
         - bearerAuth: []
@@ -177,9 +186,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /user/tenant:
+  /api/management/v1/tenantadm/user/tenant:
     get:
       description: Get users of tenant.
+      summary: Get users of tenant.
       security:
         - bearerAuth: []
       responses:
@@ -201,9 +211,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /tenants/{id}/users:
+  /api/management/v1/tenantadm/tenants/{id}/users:
     post:
       description: create tanent user
+      summary: create tanent user
       security:
         - bearerAuth: []
       parameters:
@@ -236,6 +247,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     get:
       description: get list of users of tanent
+      summary: get list of users of tanent
       security:
         - bearerAuth: []
       parameters:
@@ -270,9 +282,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /tdmap:
+  /api/management/v1/tenantadm/tdmap:
     post:
       description: create tanent device map
+      summary: create tanent device map
       security:
         - bearerAuth: []
       requestBody:
@@ -306,9 +319,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /tdmap/devices/{uuid}:
+  /api/management/v1/tenantadm/tdmap/devices/{uuid}:
     put:
       description: update tanent device map by UUID
+      summary: update tanent device map by UUID
       security:
         - bearerAuth: []
       parameters:
@@ -345,6 +359,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       description: Add single tanent device map by UUID
+      summary: Add single tanent device map by UUID
       security:
         - bearerAuth: []
       parameters:
@@ -374,9 +389,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /tdmap/{id}:
+  /api/management/v1/tenantadm/tdmap/{id}:
     put:
       description: update single tenant device map
+      summary: update single tenant device map
       security:
           - bearerAuth: []
       parameters:
@@ -413,6 +429,7 @@ paths:
                   $ref: '#/components/schemas/Error'
     delete:
       description: delete single tenant device map
+      summary: delete single tenant device map
       security:
           - bearerAuth: []
       parameters:
@@ -436,9 +453,10 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /mapcount:
+  /api/management/v1/tenantadm/mapcount:
     get:
       description: get tenant device map count
+      summary: get tenant device map count
       security:
           - bearerAuth: []
       responses:
@@ -460,7 +478,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-  /map:
+  /api/management/v1/tenantadm/map:
     post:
       security:
         - bearerAuth: []
@@ -546,12 +564,18 @@ components:
       bearerFormat: JWT
   schemas:
     Error:
-      description: Error descriptor
       type: object
       properties:
         error:
-          description: Description of the error
           type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
     tanentCountObj:
       description: tanentn count object
       type: object
@@ -559,51 +583,7 @@ components:
         count:
           type: integer
           format: int64
-    tanentArrayUser:
-      description: get all tanents users
-      type: object
-      properties:
-        id:
-          type: string
-        email:
-          type: string
-        role:
-          type: string
-        created_ts:
-          type: string
-        updated_ts:
-          type: string
-    updateTenant:
-      description: update tanent status
-      type: object
-      properties:
-        status:
-          type: string
-    createTenant:
-      description: create tanent struct
-      type: object
-      properties:
-        name:
-          type: string
-        status:
-          type: string
 
-    deviceMapRes:
-      description: device map responce on success
-      type: object
-      properties:
-        id:
-          type: string
-        UUID:
-          type: string
-        public_key:
-          type: string
-        Tenant:
-          type: string
-        created_ts:
-          type: string
-        updated_ts:
-          type: string
     fileContent:
       description: device map file conetent
       type: object
