@@ -1,0 +1,406 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Vcamlogic Internal API'
+  description: 'API for managing  virtual camera logic configuration.
+                To get and update vcam devices. Get device by ID.
+                Update slot configuration for particular device.'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/internal/v1/vcamlogic/devices:
+    get:
+      description: |
+        Get device list.
+      summary: Get the device list
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success to get the devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayDevice'
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      description: Update devices
+      summary: Update devices
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VCamsUpdate'
+      responses:
+        201:
+          description: Success to update devices.
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v1/vcamlogic/tenants:
+    description: Create tenant
+    post:
+      summary: Create tenant
+      description: Create tenant
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newTenantRequest'
+      responses:
+        201:
+          description: Success to create tenant.
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v1/vcamlogic/devices/{did}:
+    description: Get device
+    get:
+      summary: Get device
+      description: Get device
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success to get device.
+                       And also on no device found by ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getDevice'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      description: Update device local configuration.
+      summary: Update device local cofnfig.
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocalConfig'
+      responses:
+        200:
+          description: Success to update local configuration.
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}:
+    description: Get device camera slots.
+    get:
+      summary: Get device camera slots.
+      description: Get device camera slots.
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: mac
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: idx
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success to get the device camera slots.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Camera'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+
+    Camera:
+      description: camera struct
+      type: object
+      properties:
+        slot_index:
+          type: integer
+        uuid:
+          type: string
+        mac:
+          type: string
+        user_name:
+          type: string
+        password:
+          type: string
+        public_ip:
+          type: string
+        cameraTestedStatus:
+          type: integer
+        onvif_port:
+          type: integer
+        onvif_url:
+          type: string
+        rtsp_port:
+          type: integer
+        rtsp_url:
+          type: string
+        rtsp_channels:
+          type: string
+        cameraNvrRecRtspPreferred:
+          type: string
+        cameraAnalyzeRtspPreferred:
+          type: string
+        info:
+          type: string
+
+    ActiveCamera:
+      description: active cameras
+      properties:
+        slot_index:
+          type: string
+        mac:
+          type: string
+        partof:
+          type: string
+
+    Device:
+      description: device struct
+      type: object
+      properties:
+        id:
+          type: string
+        device_id:
+          type: string
+        device_uuid:
+          type: string
+        device_mac:
+          type: string
+        slot_configuration:
+          type: array
+          items:
+            $ref: '#/components/schemas/Camera'
+        slots:
+          type: object
+          properties:
+            string:
+              type: array
+              items:
+                properties:
+                  string:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Camera'
+        slot_index:
+          type: string
+        active_cams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActiveCamera'
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    ArrayDevice:
+      description: array of devices
+      type: array
+      items:
+        $ref: '#/components/schemas/Device'
+
+    error:
+      description: vcam status error
+      type: object
+      properties:
+        state:
+          type: string
+        msg:
+          type: string
+
+    info:
+      description: vcam info
+      type: object
+      properties:
+        slotIndex:
+          type: integer
+        uptime:
+          type: integer
+        restartCount:
+          type: integer
+        type:
+          type: string
+        command:
+          type: string
+        status:
+          type: string
+        error:
+          $ref: '#/components/schemas/error'
+
+    vcams:
+      description: vcam devices
+      type: object
+      properties:
+        deviceId:
+          type: string
+        mac:
+          type: string
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/info'
+
+    VCamsUpdate:
+      description: array vcam device update
+      type: object
+      properties:
+        vcams:
+          type: array
+          items:
+            $ref: '#/components/schemas/vcams'
+
+    getDevice:
+      description: device info
+      type: object
+      properties:
+        deviceId:
+          type: string
+        deviceMAC:
+          type: string
+        UUID:
+          type: string
+        vcams:
+          type: array
+          items:
+            $ref: '#/components/schemas/vcams'
+
+    newTenantRequest:
+      description: create tenant
+      type: object
+      properties:
+        tenant_id:
+          type: string
+
+    LocalConfig:
+      description: local conguration
+      type: object
+      properties:
+        device_id:
+          type: string
+        uuid:
+          type: string
+        mac:
+          type: string
+        config_details:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
