@@ -1,97 +1,89 @@
-swagger: '2.0'
+openapi: 3.0.1
 info:
-  title: Deployments
-  version: '1'
-  description: |
-    An API for deployments and artifacts management.
-    Intended for use by the web GUI.
+  version: '1.0.0'
+  title: 'Deployments Management API'
+  description: 'An API for deployments and artifacts management.
+                Intended for use by the web GUI.'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
 
-host: 'docker.mender.io'
-basePath: '/api/management/v1/deployments'
-schemes:
-  - https
-
-responses:
-  NotFoundError: # 404
-    description: Not Found.
-    schema:
-      $ref: "#/definitions/Error"
-  InternalServerError: # 500
-    description: Internal Server Error.
-    schema:
-      $ref: "#/definitions/Error"
-  InvalidRequestError: # 400
-    description: Invalid Request.
-    schema:
-      $ref: "#/definitions/Error"
-  UnprocessableEntityError: # 422
-    description: Unprocessable Entity.
-    schema:
-      $ref: "#/definitions/Error"
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
 
 paths:
-  /deployments:
+  /api/management/v1/deployments/deployments:
     get:
       summary: Find all deployments
       description: |
         Returns a filtered collection of deployments in the system,
         including active and historical. If both 'status' and 'query' are
         not specified, all devices are listed.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
-          type: string
-          format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: status
-          in: query
-          description: Deployment status filter.
-          required: false
+      - name: status
+        in: query
+        description: Deployment status filter.
+        schema:
           type: string
           enum:
-            - inprogress
-            - finished
-            - pending
-        - name: search
-          in: query
-          description: Deployment name or description filter.
-          required: false
+          - inprogress
+          - finished
+          - pending
+      - name: search
+        in: query
+        description: Deployment name or description filter.
+        schema:
           type: string
-        - name: page
-          in: query
-          description: Results page number
-          required: false
+      - name: page
+        in: query
+        description: Results page number
+        schema:
           type: number
           format: integer
-          default: 1
-        - name: per_page
-          in: query
-          description: Number of results per page
-          required: false
-          type: number
-          format: integer
-          default: 20
+          default: 1.0
+      - name: per_page
+        in: query
+        description: Number of results per page
+        schema:
           maximum: 500
-        - name: created_before
-          in: query
-          description: List only deployments created before and equal to Unix timestamp (UTC)
-          required: false
           type: number
           format: integer
-        - name: created_after
-          in: query
-          description: List only deployments created after and equal to Unix timestamp (UTC)
-          required: false
+          default: 20.0
+      - name: created_before
+        in: query
+        description: List only deployments created before and equal to Unix timestamp
+          (UTC)
+        schema:
           type: number
           format: integer
-      produces:
-        - application/json
+      - name: created_after
+        in: query
+        description: List only deployments created after and equal to Unix timestamp
+          (UTC)
+        schema:
+          type: number
+          format: integer
       responses:
         200:
           description: Successful response.
-          examples:
+          headers:
+            Link:
+              description: Standard header, we support 'first', 'next', and 'prev'.
+              schema:
+                type: string
+          content:
             application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deployment'
+              example:
               - created: 2016-02-11T13:03:17.063493443Z
                 status: finished
                 name: production
@@ -99,19 +91,18 @@ paths:
                 id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
                 finished: 2016-03-11T13:03:17.063493443Z
                 device_count: 10
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Deployment'
-          headers:
-            Link:
-              type: string
-              description: Standard header, we support 'first', 'next', and 'prev'.
         400:
-          $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       summary: Create a deployment
       description: |
@@ -121,73 +112,100 @@ paths:
         considered finished successfully as well as receive status of `noartifact`.
         If there is no artifacts for the deployment, deployment will not be created
         and the 422 Unprocessable Entity status code will be returned.
-
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: deployment
-          in: body
-          description: New deployment that needs to be created.
-          required: true
-          schema:
-            $ref: "#/definitions/NewDeployment"
-      produces:
-        - application/json
+      requestBody:
+        description: New deployment that needs to be created.
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/NewDeployment'
+        required: true
       responses:
         201:
           description: New deployment created.
           headers:
             Location:
               description: URL of the newly created deployment.
-              type: string
+              schema:
+                type: string
+          content: {}
         400:
-          $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         422:
-            $ref: "#/responses/UnprocessableEntityError"
+          description: Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /deployments/{id}:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: deployment
+  /api/management/v1/deployments/deployments/{id}:
     get:
       summary: Get the details of a selected deployment
       description: |
         Returns the details of a particular deployment.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: id
-          in: path
-          description: Deployment identifier.
-          required: true
+      - name: id
+        in: path
+        description: Deployment identifier.
+        required: true
+        schema:
           type: string
-      produces:
-        - application/json
       responses:
         200:
           description: Successful response.
-          examples:
+          content:
             application/json:
-              created: 2016-02-11T13:03:17.063493443Z
-              name: production
-              artifact_name: Application 0.0.1
-              id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
-              finished: 2016-03-11T13:03:17.063493443Z
-          schema:
-            $ref: "#/definitions/Deployment"
+              schema:
+                $ref: '#/components/schemas/Deployment'
+              example:
+                created: 2016-02-11T13:03:17.063493443Z
+                name: production
+                artifact_name: Application 0.0.1
+                id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
+                finished: 2016-03-11T13:03:17.063493443Z
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /deployments/{deployment_id}/status:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/deployments/{deployment_id}/status:
     put:
       summary: Abort the deployment
       description: |
@@ -195,454 +213,592 @@ paths:
         - Devices that have completed the deployment (i.e. reported final status) are not affected by the abort, and their original status is kept in the deployment report.
         - Devices that do not yet know about the deployment at time of abort will not start the deployment.
         - Devices that are in the middle of the deployment at time of abort will finish its deployment normally, but they will not be able to change its deployment status so they will perform rollback.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: deployment_id
-          in: path
-          description: Deployment identifier.
-          required: true
+      - name: deployment_id
+        in: path
+        description: Deployment identifier.
+        required: true
+        schema:
           type: string
-        - name: Status
-          in: body
-          description: Deployment status.
-          required: true
-          schema:
-            type: object
-            properties:
-              status:
-                type: string
-                enum:
-                - aborted
-            required:
+      requestBody:
+        description: Deployment status.
+        content:
+          '*/*':
+            schema:
+              required:
               - status
-      produces:
-        - application/json
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - aborted
+        required: true
       responses:
         204:
-            description: Status updated successfully.
+          description: Status updated successfully.
+          content: {}
         400:
-            $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
-            $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         422:
-            $ref: "#/responses/UnprocessableEntityError"
+          description: Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-            $ref: "#/responses/InternalServerError"
-
-  /deployments/{deployment_id}/statistics:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: Status
+  /api/management/v1/deployments/deployments/{deployment_id}/statistics:
     get:
       summary: Get the statistics of a selected deployment
       description: |
         Returns the statistics of a selected deployment statuses.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: deployment_id
-          in: path
-          description: Deployment identifier
-          required: true
+      - name: deployment_id
+        in: path
+        description: Deployment identifier
+        required: true
+        schema:
           type: string
-      produces:
-        - application/json
       responses:
         200:
           description: OK
-          examples:
+          content:
             application/json:
-              success: 3
-              pending: 1
-              failure: 0
-              downloading: 1
-              installing: 2
-              rebooting: 3
-              noartifact: 0
-              already-installed: 0
-              aborted: 0
-          schema:
-            $ref: "#/definitions/DeploymentStatistics"
+              schema:
+                $ref: '#/components/schemas/DeploymentStatistics'
+              example:
+                success: 3
+                pending: 1
+                failure: 0
+                downloading: 1
+                installing: 2
+                rebooting: 3
+                noartifact: 0
+                already-installed: 0
+                aborted: 0
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /deployments/{deployment_id}/devices:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/deployments/{deployment_id}/devices:
     get:
       summary: List devices of a deployment
       description: |
         Returns a collection of a selected deployment's status for each assigned device.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: deployment_id
-          in: path
-          description: Deployment identifier.
-          required: true
+      - name: deployment_id
+        in: path
+        description: Deployment identifier.
+        required: true
+        schema:
           type: string
-      produces:
-        - application/json
       responses:
         200:
           description: OK
-          examples:
+          content:
             application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+              example:
               - id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
                 finished: 2016-03-11T13:03:17.063493443Z
                 status: pending
                 created: 2016-02-11T13:03:17.063493443Z
                 device_type: Raspberry Pi 3
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/Device"
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /deployments/{deployment_id}/devices/{device_id}/log:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/deployments/{deployment_id}/devices/{device_id}/log:
     get:
       summary: Get the log of a selected device's deployment
       description: |
         Returns the log of a selected device, collected during a particular deployment.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: deployment_id
-          in: path
-          description: Deployment identifier.
-          required: true
+      - name: deployment_id
+        in: path
+        description: Deployment identifier.
+        required: true
+        schema:
           type: string
-        - name: device_id
-          in: path
-          description: Device identifier.
-          required: true
+      - name: device_id
+        in: path
+        description: Device identifier.
+        required: true
+        schema:
           type: string
-      produces:
-        - text/plain
       responses:
         200:
           description: Successful response.
+          content: {}
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /deployments/devices/{id}:
+          description: Internal Server Error.
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/deployments/devices/{id}:
     delete:
       summary: Remove device from all deployments
-      description: Set 'decommissioned' status to all pending device deployments for a given device
+      description: Set 'decommissioned' status to all pending device deployments for
+        a given device
+      security:
+      - bearerAuth: []
       parameters:
-        - name: id
-          in: path
-          description: System wide device identifier
-          required: true
+      - name: id
+        in: path
+        description: System wide device identifier
+        required: true
+        schema:
           type: string
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
       responses:
         204:
           description: Device was removed
+          content: {}
         500:
           description: Internal server error.
-          schema:
-              $ref: "#/definitions/Error"
-
-  /deployments/releases:
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/deployments/releases:
     get:
       summary: List releases
       description: |
         Returns a collection of releases, allows filtering by release name.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: name
-          in: query
-          description: Release name filter.
-          required: false
+      - name: name
+        in: query
+        description: Release name filter.
+        schema:
           type: string
-      produces:
-        - application/json
       responses:
         200:
           description: Successful response.
-          examples:
+          content:
             application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Release'
+              example:
               - name: my-app-v1.0.1
                 artifacts:
-                  - name: my-app-v1.0.1
-                    description: Application v1.0.1
-                    device_types_compatible: [Beagle Bone]
-                    id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
-                    signed: false
-                    modified: "2016-03-11T13:03:17.063493443Z"
-                    info:
-                      type_info:
-                        type: rootfs
-                    files:
-                      - name: rootfs-image-1
-                        checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
-                        size: 23421351
-                        date: 2016-03-11T13:03:17.063+0000
-                    metadata: {}
-                  - name: my-app-v1.0.1
-                    description: Application v1.0.1
-                    device_types_compatible: [Raspberry Pi]
-                    id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
-                    signed: false
-                    modified: "2016-03-11T13:03:17.063493443Z"
-                    info:
-                      type_info:
-                        type: rootfs
-                    files:
-                      - name: rootfs-image-1
-                        checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
-                        size: 23421351
-                        date: 2016-03-11T13:03:17.063+0000
-                    metadata: {}
+                - name: my-app-v1.0.1
+                  description: Application v1.0.1
+                  device_types_compatible:
+                  - Beagle Bone
+                  id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
+                  signed: false
+                  modified: 2016-03-11T13:03:17.063493443Z
+                  info:
+                    type_info:
+                      type: rootfs
+                  files:
+                  - name: rootfs-image-1
+                    checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
+                    size: 23421351
+                    date: 2016-03-11T13:03:17.063+0000
+                  metadata: {}
+                - name: my-app-v1.0.1
+                  description: Application v1.0.1
+                  device_types_compatible:
+                  - Raspberry Pi
+                  id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
+                  signed: false
+                  modified: 2016-03-11T13:03:17.063493443Z
+                  info:
+                    type_info:
+                      type: rootfs
+                  files:
+                  - name: rootfs-image-1
+                    checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
+                    size: 23421351
+                    date: 2016-03-11T13:03:17.063+0000
+                  metadata: {}
               - name: my-app-v2.0.0
                 artifacts:
-                  - name: my-app-v2.0.0
-                    description: Application v2.0.0
-                    device_types_compatible: [Beagle Bone]
-                    id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
-                    signed: false
-                    modified: "2016-03-11T13:03:17.063493443Z"
-                    info:
-                      type_info:
-                        type: rootfs
-                    files:
-                      - name: rootfs-image-1
-                        checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
-                        size: 23421351
-                        date: 2016-03-11T13:03:17.063+0000
-                    metadata: {}
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Release'
+                - name: my-app-v2.0.0
+                  description: Application v2.0.0
+                  device_types_compatible:
+                  - Beagle Bone
+                  id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
+                  signed: false
+                  modified: 2016-03-11T13:03:17.063493443Z
+                  info:
+                    type_info:
+                      type: rootfs
+                  files:
+                  - name: rootfs-image-1
+                    checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
+                    size: 23421351
+                    date: 2016-03-11T13:03:17.063+0000
+                  metadata: {}
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /artifacts:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/artifacts:
     get:
       summary: List known artifacts
       description: |
         Returns a collection of all artifacts.
-      produces:
-        - application/json
+      security:
+      - bearerAuth: []
       responses:
         200:
           description: OK
-          examples:
+          content:
             application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Artifact'
+              example:
               - name: Application 1.0.0
                 description: Johns Monday test build
-                device_types_compatible: [Beagle Bone]
+                device_types_compatible:
+                - Beagle Bone
                 id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
                 signed: false
-                modified: "2016-03-11T13:03:17.063493443Z"
+                modified: 2016-03-11T13:03:17.063493443Z
                 info:
-                    type_info:
-                        type: rootfs
+                  type_info:
+                    type: rootfs
                 files:
-                  - name: rootfs-image-1
-                    checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
-                    size: 123
-                    date: 2016-03-11T13:03:17.063+0000
+                - name: rootfs-image-1
+                  checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
+                  size: 123
+                  date: 2016-03-11T13:03:17.063+0000
                 metadata: {}
-          schema:
-            type: array
-            items:
-              $ref: "#/definitions/Artifact"
-
         500:
-          $ref: "#/responses/InternalServerError"
-
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     post:
       summary: Upload mender artifact
       description: |
         Upload mender artifact. Multipart request with meta and artifact.
 
         Supports artifact (versions v1, v2)[https://docs.mender.io/development/architecture/mender-artifacts#versions].
-      consumes:
-        - multipart/form-data
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: size
-          in: formData
-          description: Size of the artifact file in bytes.
-          required: true
-          type: integer
-          format: long
-        - name: description
-          in: formData
-          required: false
-          type: string
-        - name: artifact
-          in: formData
-          description: Artifact. It has to be the last part of request.
-          required: true
-          type: file
-      produces:
-        - application/json
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - artifact
+              - size
+              properties:
+                size:
+                  type: integer
+                  description: Size of the artifact file in bytes.
+                  format: long
+                description:
+                  type: string
+                artifact:
+                  type: string
+                  description: Artifact. It has to be the last part of request.
+                  format: binary
+        required: true
       responses:
         201:
           description: Artifact uploaded.
           headers:
             Location:
               description: URL of the newly uploaded artifact.
-              type: string
+              schema:
+                type: string
+          content: {}
         400:
-          $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /artifacts/{id}:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/artifacts/{id}:
     get:
       summary: Get the details of a selected artifact
       description: |
         Returns the details of a selected artifact.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: id
-          in: path
-          description: Artifact identifier.
-          required: true
+      - name: id
+        in: path
+        description: Artifact identifier.
+        required: true
+        schema:
           type: string
-      produces:
-        - application/json
       responses:
         200:
           description: Successful response.
-          examples:
+          content:
             application/json:
-              name: Application 1.0.0
-              description: Johns Monday test build
-              device_types_compatible: [Beagle Bone]
-              id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
-              signed: false
-              modified: "2016-03-11T13:03:17.063493443Z"
-              info:
+              schema:
+                $ref: '#/components/schemas/Artifact'
+              example:
+                name: Application 1.0.0
+                description: Johns Monday test build
+                device_types_compatible:
+                - Beagle Bone
+                id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
+                signed: false
+                modified: 2016-03-11T13:03:17.063493443Z
+                info:
                   type_info:
-                      type: rootfs
-              files:
+                    type: rootfs
+                files:
                 - name: rootfs-image-1
                   checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
                   size: 123
                   date: 2016-03-11T13:03:17.063+0000
-              metadata: {}
-          schema:
-            $ref: "#/definitions/Artifact"
+                metadata: {}
         400:
-          $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     put:
       summary: Update description of a selected artifact
       description: |
         Edit description. Artifact is not allowed to be edited if it was used
         in any deployment.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: id
-          in: path
-          description: Artifact identifier.
-          required: true
+      - name: id
+        in: path
+        description: Artifact identifier.
+        required: true
+        schema:
           type: string
-        - name: artifact
-          in: body
-          schema:
-            $ref: "#/definitions/ArtifactUpdate"
-      produces:
-        - application/json
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/ArtifactUpdate'
+        required: false
       responses:
         204:
           description: The artifact metadata updated successfully.
+          content: {}
         400:
-          $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         422:
-          $ref: "#/responses/UnprocessableEntityError"
+          description: Unprocessable Entity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: artifact
     delete:
       summary: Delete the artifact
       description: |
         Deletes the artifact from file and artifacts storage.
         Artifacts used by deployments in progress can not be deleted
         until deployment finishes.
-      produces:
-        - application/json
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: id
-          in: path
-          description: Artifact identifier.
-          required: true
+      - name: id
+        in: path
+        description: Artifact identifier.
+        required: true
+        schema:
           type: string
       responses:
         204:
           description: The artifact deleted successfully.
+          content: {}
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         409:
           description: Artifact used by active deployment.
-          schema:
-            $ref: "#/definitions/Error"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-
-  /artifacts/{id}/download:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/artifacts/{id}/download:
     get:
       summary: Get the download link of a selected artifact
       description: |
@@ -650,197 +806,234 @@ paths:
         with GET HTTP method. Link supports such HTTP headers: 'Range',
         'If-Modified-Since', 'If-Unmodified-Since' It is valid for specified
         period of time.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-        - name: id
-          in: path
-          description: Artifact identifier.
-          required: true
+      - name: id
+        in: path
+        description: Artifact identifier.
+        required: true
+        schema:
           type: string
-      produces:
-        - application/json
       responses:
         200:
           description: Successful response.
-          schema:
-            $ref: "#/definitions/ArtifactLink"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactLink'
         400:
-          $ref: "#/responses/InvalidRequestError"
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
-          $ref: "#/responses/NotFoundError"
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          $ref: "#/responses/InternalServerError"
-  /limits/storage:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/limits/storage:
     get:
       summary: Get storage limit and current storage usage
       description: |
         Get storage limit and current storage usage for currently logged in user.
         If the limit value is 0 it means there is no limit for storage for logged in user.
+      security:
+      - bearerAuth: []
       parameters:
-        - name: Authorization
-          in: header
-          required: true
+      - name: Authorization
+        in: header
+        description: Contains the JWT token issued by the User Administration and
+          Authentication Service.
+        required: true
+        schema:
           type: string
           format: Bearer [token]
-          description: Contains the JWT token issued by the User Administration and Authentication Service.
-      produces:
-        - application/json
       responses:
         200:
           description: Successful response.
-          schema:
-            $ref: "#/definitions/StorageLimit"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageLimit'
         500:
-          $ref: "#/responses/InternalServerError"
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
 
-definitions:
-  Error:
-    description: Error descriptor.
-    type: object
-    properties:
-      error:
-        description: Description of the error.
-        type: string
-      request_id:
-        description: Request ID (same as in X-MEN-RequestID header).
-        type: string
-    example:
-      application/json:
-          error: "failed to decode device group data: JSON payload is empty"
-          request_id: "f7881e82-0492-49fb-b459-795654e7188a"
-  NewDeployment:
-    type: object
-    properties:
-      name:
-        type: string
-      artifact_name:
-        type: string
-      devices:
-        type: array
-        items:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
           type: string
-          description: An array of devices' identifiers.
-    required:
-      - name
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        application/json:
+          error: 'Error string'
+          request_id: f7881e82-0492-49fb-b459-795654e7188a
+    NewDeployment:
+      required:
       - artifact_name
       - devices
-    example:
-      application/json:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        artifact_name:
+          type: string
+        devices:
+          type: array
+          items:
+            type: string
+            description: An array of devices' identifiers.
+      example:
+        application/json:
         - name: production
           artifact_name: Application 0.0.1
           devices:
-            - 00a0c91e6-7dec-11d0-a765-f81d4faebf6
-  Deployment:
-    type: object
-    properties:
-      created:
-        type: string
-        format: date-time
-      name:
-        type: string
-      artifact_name:
-        type: string
-      id:
-        type: string
-      finished:
-        type: string
-        format: date-time
-      status:
-        type: string
-        enum:
+          - 00a0c91e6-7dec-11d0-a765-f81d4faebf6
+    Deployment:
+      required:
+      - artifact_name
+      - created
+      - device_count
+      - id
+      - name
+      - status
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+        name:
+          type: string
+        artifact_name:
+          type: string
+        id:
+          type: string
+        finished:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
           - inprogress
           - pending
           - finished
-      device_count:
-        type: integer
-      artifacts:
-        type: array
-        items:
-          type: string
-          description: An array of artifact's identifiers.
-    required:
-      - created
-      - name
-      - artifact_name
-      - id
-      - status
-      - device_count
-    example:
-      application/json:
-        created: 2016-02-11T13:03:17.063493443Z
-        status: finished
-        name: production
-        artifact_name: Application 0.0.1
-        id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
-        finished: 2016-03-11T13:03:17.063493443Z
-  DeploymentStatistics:
-    type: object
-    properties:
-      success:
-        type: integer
-        description: Number of successful deployments.
-      pending:
-        type: integer
-        description: Number of pending deployments.
-      downloading:
-        type: integer
-        description: Number of deployments being downloaded.
-      rebooting:
-        type: integer
-        description: Number of deployments devices are rebooting into.
-      installing:
-        type: integer
-        description: Number of deployments devices being installed.
-      failure:
-        type: integer
-        description: Number of failed deployments.
-      noartifact:
-        type: integer
-        description: Do not have appropriate artifact for device type.
-      already-installed:
-        type: integer
-        description: Number of devices unaffected by upgrade, since they are already running the specified software version.
-      aborted:
-        type: integer
-        description: Number of deployments aborted by user.
-    required:
-      - success
-      - pending
-      - downloading
-      - installing
-      - rebooting
-      - failure
-      - noartifact
-      - already-installed
+        device_count:
+          type: integer
+        artifacts:
+          type: array
+          items:
+            type: string
+            description: An array of artifact's identifiers.
+      example:
+        application/json:
+          created: 2016-02-11T13:03:17.063493443Z
+          status: finished
+          name: production
+          artifact_name: Application 0.0.1
+          id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
+          finished: 2016-03-11T13:03:17.063493443Z
+    DeploymentStatistics:
+      required:
       - aborted
-    example:
-      application/json:
-        success: 3
-        pending: 1
-        failure: 0
-        downloading: 1
-        installing: 2
-        rebooting: 3
-        noartifact: 0
-        already-installed: 0
-        aborted: 0
-  Device:
-    type: object
-    properties:
-      id:
-        type: string
-        description: Device identifier.
-      finished:
-        type: string
-        format: date-time
-      status:
-        type: string
-        enum:
+      - already-installed
+      - downloading
+      - failure
+      - installing
+      - noartifact
+      - pending
+      - rebooting
+      - success
+      type: object
+      properties:
+        success:
+          type: integer
+          description: Number of successful deployments.
+        pending:
+          type: integer
+          description: Number of pending deployments.
+        downloading:
+          type: integer
+          description: Number of deployments being downloaded.
+        rebooting:
+          type: integer
+          description: Number of deployments devices are rebooting into.
+        installing:
+          type: integer
+          description: Number of deployments devices being installed.
+        failure:
+          type: integer
+          description: Number of failed deployments.
+        noartifact:
+          type: integer
+          description: Do not have appropriate artifact for device type.
+        already-installed:
+          type: integer
+          description: Number of devices unaffected by upgrade, since they are already
+            running the specified software version.
+        aborted:
+          type: integer
+          description: Number of deployments aborted by user.
+      example:
+        application/json:
+          success: 3
+          pending: 1
+          failure: 0
+          downloading: 1
+          installing: 2
+          rebooting: 3
+          noartifact: 0
+          already-installed: 0
+          aborted: 0
+    Device:
+      required:
+      - id
+      - log
+      - status
+      type: object
+      properties:
+        id:
+          type: string
+          description: Device identifier.
+        finished:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
           - downloading
           - installing
           - rebooting
@@ -851,26 +1044,22 @@ definitions:
           - already-installed
           - aborted
           - decommissioned
-      created:
-        type: string
-        format: date-time
-      device_type:
-        type: string
-      log:
-        type: boolean
-        description: Availability of the device's deployment log.
-      state:
-        type: string
-        description: State reported by device
-      substate:
-        type: string
-        description: Additional state information
-    required:
-      - id
-      - status
-      - log
-    example:
-      application/json:
+        created:
+          type: string
+          format: date-time
+        device_type:
+          type: string
+        log:
+          type: boolean
+          description: Availability of the device's deployment log.
+        state:
+          type: string
+          description: State reported by device
+        substate:
+          type: string
+          description: Additional state information
+      example:
+        application/json:
         - id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
           finished: 2016-03-11T13:03:17.063493443Z
           status: inprogress
@@ -879,24 +1068,22 @@ definitions:
           log: false
           state: installing
           substate: installing.enter;script:foo-bar
-  ArtifactUpdate:
-    description: Artifact information update.
-    type: object
-    properties:
-      description:
-        type: string
-    example:
-      description: Some description
-  ArtifactTypeInfo:
-      description: |
-          Information about update type.
+    ArtifactUpdate:
+      type: object
+      properties:
+        description:
+          type: string
+      description: Artifact information update.
+      example:
+        description: Some description
+    ArtifactTypeInfo:
       type: object
       properties:
         type:
           type: string
-  UpdateFile:
       description: |
-          Information about particular update file.
+        Information about update type.
+    UpdateFile:
       type: object
       properties:
         name:
@@ -908,169 +1095,199 @@ definitions:
         date:
           type: string
           format: date-time
-  Update:
       description: |
-          Single updated to be applied.
+        Information about particular update file.
+    Update:
       type: object
       properties:
         type_info:
-          $ref: "#/definitions/ArtifactTypeInfo"
+          $ref: '#/components/schemas/ArtifactTypeInfo'
         files:
           type: array
           items:
-            $ref: "#/definitions/UpdateFile"
+            $ref: '#/components/schemas/UpdateFile'
         meta_data:
           type: object
+          properties: {}
           description: |
-              meta_data is an object of unknown structure as this is dependent of update type (also custom defined by user)
-  ArtifactInfo:
+            meta_data is an object of unknown structure as this is dependent of update type (also custom defined by user)
       description: |
-          Information about artifact format and version.
+        Single updated to be applied.
+    ArtifactInfo:
       type: object
       properties:
         format:
           type: string
         version:
           type: integer
-  Artifact:
-    description: Detailed artifact.
-    type: object
-    properties:
-      name:
-        type: string
-      description:
-        type: string
-      device_types_compatible:
-        type: array
-        items:
-          type: string
-          description: An array of compatible device types.
-      id:
-        type: string
-      signed:
-        type: boolean
-        description: Idicates if artifact is signed or not.
-      modified:
-        type: string
-        format: date-time
-        description: |
-            Represents creation / last edition of any of the artifact properties.
-      size:
-        required: false
-        type: number
-        format: integer
-        description: |
-            Artifact total size in bytes - the size of the actual file that will be transferred to the device (compressed).
-      info:
-        $ref: "#/definitions/ArtifactInfo"
-      updates:
-        type: array
-        items:
-          $ref: "#/definitions/Update"
-    required:
-      - name
+      description: |
+        Information about artifact format and version.
+    Artifact:
+      required:
       - description
       - device_types_compatible
       - id
       - modified
-    example:
-      application/json:
-        name: Application 1.0.0
-        size: 36891648
-        description: Johns Monday test build
-        device_types_compatible: [Beagle Bone]
-        id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
-        signed: false
-        modified: "2016-03-11T13:03:17.063493443Z"
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        device_types_compatible:
+          type: array
+          items:
+            type: string
+            description: An array of compatible device types.
+        id:
+          type: string
+        signed:
+          type: boolean
+          description: Idicates if artifact is signed or not.
+        modified:
+          type: string
+          description: |
+            Represents creation / last edition of any of the artifact properties.
+          format: date-time
+        size:
+          type: number
+          description: |
+            Artifact total size in bytes - the size of the actual file that will be transferred to the device (compressed).
+          format: integer
         info:
+          $ref: '#/components/schemas/ArtifactInfo'
+        updates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Update'
+      description: Detailed artifact.
+      example:
+        application/json:
+          name: Application 1.0.0
+          size: 36891648
+          description: Johns Monday test build
+          device_types_compatible:
+          - Beagle Bone
+          id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
+          signed: false
+          modified: 2016-03-11T13:03:17.063493443Z
+          info:
             type_info:
-                type: rootfs
-        files:
+              type: rootfs
+          files:
           - name: rootfs-image-1
             checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
             size: 123
             date: 2016-03-11T13:03:17.063+0000
-        metadata: {}
-  ArtifactLink:
-    description: URL for artifact file download.
-    type: object
-    properties:
-      uri:
-        type: string
-      expire:
-        type: string
-        format: date-time
-    required:
-      - uri
+          metadata: {}
+    ArtifactLink:
+      required:
       - expire
-    example:
-      application/json:
-        uri: http://mender.io/artifact.tar.gz.mender
-        expire: 2016-10-29T10:45:34Z
-  StorageLimit:
-    description: Tenant account storage limit and storage usage.
-    type: object
-    properties:
-      limit:
-        type: integer
-        description: |
-            Storage limit in bytes. If set to 0 - there is no limit for storage.
-      usage:
-        type: integer
-        description: |
-            Current storage usage in bytes.
-    required:
+      - uri
+      type: object
+      properties:
+        uri:
+          type: string
+        expire:
+          type: string
+          format: date-time
+      description: URL for artifact file download.
+      example:
+        application/json:
+          uri: http://mender.io/artifact.tar.gz.mender
+          expire: 2016-10-29T10:45:34Z
+    StorageLimit:
+      required:
       - limit
       - usage
-    example:
-      application/json:
-        limit: 1073741824
-        usage: 536870912
-  Release:
-    description: Groups artifacts with the same release name into a single resource.
-    type: object
-    properties:
-      name:
-        type: string
-        description: |
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: |
+            Storage limit in bytes. If set to 0 - there is no limit for storage.
+        usage:
+          type: integer
+          description: |
+            Current storage usage in bytes.
+      description: Tenant account storage limit and storage usage.
+      example:
+        application/json:
+          limit: 1073741824
+          usage: 536870912
+    Release:
+      type: object
+      properties:
+        name:
+          type: string
+          description: |
             release name.
-      artifacts:
-        type: array
-        items:
-          $ref: "#/definitions/Artifact"
-        description: |
-            list of artifacts for this release.
-    example:
-      application/json:
-        name: my-app-v1.0.1
         artifacts:
+          type: array
+          description: |
+            list of artifacts for this release.
+          items:
+            $ref: '#/components/schemas/Artifact'
+      description: Groups artifacts with the same release name into a single resource.
+      example:
+        application/json:
+          name: my-app-v1.0.1
+          artifacts:
           - name: my-app-v1.0.1
             description: Application v1.0.1
-            device_types_compatible: [Beagle Bone]
+            device_types_compatible:
+            - Beagle Bone
             id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
             signed: false
-            modified: "2016-03-11T13:03:17.063493443Z"
+            modified: 2016-03-11T13:03:17.063493443Z
             info:
               type_info:
                 type: rootfs
             files:
-              - name: rootfs-image-1
-                checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
-                size: 23421351
-                date: 2016-03-11T13:03:17.063+0000
+            - name: rootfs-image-1
+              checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
+              size: 23421351
+              date: 2016-03-11T13:03:17.063+0000
             metadata: {}
           - name: my-app-v1.0.1
             description: Application v1.0.1
-            device_types_compatible: [Raspberry Pi]
+            device_types_compatible:
+            - Raspberry Pi
             id: 0c13a0e6-6b63-475d-8260-ee42a590e8ff
             signed: false
-            modified: "2016-03-11T13:03:17.063493443Z"
+            modified: 2016-03-11T13:03:17.063493443Z
             info:
               type_info:
                 type: rootfs
             files:
-              - name: rootfs-image-1
-                checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
-                size: 23421351
-                date: 2016-03-11T13:03:17.063+0000
+            - name: rootfs-image-1
+              checksum: cc436f982bc60a8255fe1926a450db5f195a19ad
+              size: 23421351
+              date: 2016-03-11T13:03:17.063+0000
             metadata: {}
+  responses:
+    InternalServerError:
+      description: Internal Server Error.
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidRequestError:
+      description: Invalid Request.
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: Not Found.
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntityError:
+      description: Unprocessable Entity.
+      content:
+        '*/*':
+          schema:
+            $ref: '#/components/schemas/Error'
