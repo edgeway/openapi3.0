@@ -1,23 +1,27 @@
 openapi: '3.0.0'
-
 info:
   version: '1.0.0'
-  title: infra-manager management API
+  title: 'Infra-manager Management API'
+  description: 'The management api for Infrastructure config and status.
+                Getting infrastructure list and individual infrastructure by instance ID.
+                Moreover, getting the number of infrastructe existance.
+                Update and delete the particular infrastructure.'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
 
 servers:
-  - url: '{protocol}://trial.edgeway.io/{basePath}'
-    variables:
-      protocol:
-        enum: [http, https]
-        default: https
-      basePath: 
-        enum: [/api/management/v1/infra_manager/infra]
-        default: /api/management/v1/infra_manager/infra
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
 
 paths:
-  /:
+  /api/management/v1/infra_manager/infra:
     post:
-      description: create infrastructure request
+      description: Create infrastructure request
+      summary: Create infrastructure request
       security:
         - bearerAuth: []
       requestBody:
@@ -34,10 +38,21 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
     get:
-      description: get infrastructure request
+      description: Get infrastructure request
+      summary: Get infrastructure request
       security:
         - bearerAuth: []
       parameters:
@@ -64,11 +79,22 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
-  /{id}:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/infra_manager/infra/{id}:
     get:
-      description: get infrastructure request
+      description: Get infrastructure request
+      summary: Get infrastructure request
       security:
         - bearerAuth: []
       parameters:
@@ -89,11 +115,22 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/ErrorGetInfra'
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
     put:
-      description: update infrastructure by id
+      description: Update infrastructure by id
+      summary: Update infrastructure by id
       security:
         - bearerAuth: []
       parameters:
@@ -119,11 +156,22 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/ErrorGetInfra'
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
     delete:
-      description: delete infrastructure by id
+      description: Delete infrastructure by id
+      summary: Delete infrastructure by id
       security:
         - bearerAuth: []
       parameters:
@@ -145,11 +193,22 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
-  /servers/count:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/infra_manager/infra/servers/count:
     get:
-      description: get infrastructures count
+      description: Get infrastructures count
+      summary: Get infrastructures count
       security:
         - bearerAuth: []
       responses:
@@ -165,11 +224,22 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
-  /instance/{id}:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/infra_manager/infra/instance/{id}:
     get:
-      description: get infrastructure by instace ID
+      description: Get infrastructure by instace ID
+      summary: Get infrastructure by instace ID
       security:
         - bearerAuth: []
       parameters:
@@ -190,9 +260,19 @@ paths:
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/getInfraStructuresObj'
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           500:
             description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
 
 
 components:
@@ -203,21 +283,18 @@ components:
       bearerFormat: JWT
   schemas:
     Error:
-      description: Error descriptor
       type: object
       properties:
         error:
-          description: Description of the error
           type: string
-    ErrorGetInfra:
-      description: Error descriptor
-      type: object
-      properties:
-        error:
-          description: Description of the error
-          type: string
+          description: Description of the error.
         request_id:
           type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
     onvifRtspPortRange:
       description: onvif port ranges object
       type: object
@@ -237,10 +314,8 @@ components:
         public_ip:
           type: string
         onvif_port_range:
-          type: object
           $ref: '#/components/schemas/onvifRtspPortRange'
         rtsp_port_range:
-          type: object
           $ref: '#/components/schemas/onvifRtspPortRange'
     getInfraStructuresObj:
       description: get infrastructure object
@@ -253,10 +328,8 @@ components:
         public_ip:
           type: string
         onvif_port_range:
-          type: object
           $ref: '#/components/schemas/onvifRtspPortRange'
         rtsp_port_range:
-          type: object
           $ref: '#/components/schemas/onvifRtspPortRange'
         created_ts:
           type: string
@@ -272,10 +345,8 @@ components:
       type: object
       properties:
         onvif_port_range:
-            type: object
             $ref: '#/components/schemas/onvifRtspPortRange'
         rtsp_port_range:
-          type: object
           $ref: '#/components/schemas/onvifRtspPortRange'
     countObj:
       description: count object
@@ -283,4 +354,3 @@ components:
       properties:
         count:
           type: number
-
