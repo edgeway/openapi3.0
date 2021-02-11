@@ -21,7 +21,8 @@ servers:
 paths:
   /api/management/v1/tenantadm/tenants:
     get:
-      summary: get tenants
+      summary: Get tenants
+      description: Get tenants
       security:
         - bearerAuth: []
       parameters:
@@ -57,8 +58,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      description: provison tenant
-      summary: provison tenant
+      description: Provison tenant
+      summary: Provison tenant
       security:
         - bearerAuth: []
       requestBody:
@@ -90,8 +91,8 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tenants/token/{uuid}:
     get:
-      description: get tenant token
-      summary: get tenant token
+      description: Get tenant token
+      summary: Get tenant token
       security:
         - bearerAuth: []
       parameters:
@@ -127,8 +128,8 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/users:
     post:
-      description: create user
-      summary: create user
+      description: Create user
+      summary: Create user
       security:
         - bearerAuth: []
       requestBody:
@@ -165,8 +166,8 @@ paths:
                   $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tenants/{tid}/users/{uid}:
     put:
-        description: update user
-        summary: update user
+        description: Update user
+        summary: Update user
         security:
           - bearerAuth: []
         parameters:
@@ -214,8 +215,8 @@ paths:
                 schema:
                   $ref: '#/components/schemas/Error'
     delete:
-        description: delete user
-        summary: delete user
+        description: Delete user
+        summary: Delete user
         security:
             - bearerAuth: []
         parameters:
@@ -252,8 +253,8 @@ paths:
                   $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tokens:
     delete:
-      description: delete token by token ID
-      summary: delete token by token ID
+      description: Delete token by token ID
+      summary: Delete token by token ID
       security:
           - bearerAuth: []
       parameters:
@@ -285,8 +286,8 @@ paths:
                   $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tdmap:
     post:
-      description: add single tanent device map
-      summary: add single tanent device map
+      description: Add single tanent device map
+      summary: Add single tanent device map
       security:
           - bearerAuth: []
       requestBody:
