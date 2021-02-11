@@ -51,13 +51,22 @@ paths:
           content: {}
         400:
           description: Missing or malformed request parameters.
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         401:
           description: Verification failed, authentication should not be granted.
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         403:
           description: Token has expired - apply for a new one.
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error.
           content:
@@ -83,7 +92,10 @@ paths:
           content: {}
         400:
           description: Missing or malformed request parameters.
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error.
           content:
@@ -202,13 +214,13 @@ paths:
           description: |
             Invalid parameters.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         500:
           description: Internal server error.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
 
