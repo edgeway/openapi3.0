@@ -100,8 +100,8 @@ paths:
           description: Unexpected error
   /api/management/v1/tenantadm/tenants/count:
     get:
-      summary: get the number of tanent
-      description: get the number of tanent
+      summary: Get the number of tanent
+      description: Get the number of tanent
       security:
         - bearerAuth: []
       responses:
@@ -121,8 +121,8 @@ paths:
           description: Unexpected error
   /api/management/v1/tenantadm/tanents/{id}:
     put:
-      summary: update tanent
-      description: update tanent
+      summary: Update tanent
+      description: Update tanent
       security:
         - bearerAuth: []
       parameters:
@@ -160,8 +160,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     delete:
-      description: delete tanent
-      summary: delete tanent
+      description: Delete tanent
+      summary: Delete tanent
       security:
         - bearerAuth: []
       parameters:
@@ -213,8 +213,8 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tenants/{id}/users:
     post:
-      description: create tanent user
-      summary: create tanent user
+      description: Create tanent user
+      summary: Create tanent user
       security:
         - bearerAuth: []
       parameters:
@@ -246,8 +246,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     get:
-      description: get list of users of tanent
-      summary: get list of users of tanent
+      description: Get list of users of tanent
+      summary: Get list of users of tanent
       security:
         - bearerAuth: []
       parameters:
@@ -284,8 +284,8 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tdmap:
     post:
-      description: create tanent device map
-      summary: create tanent device map
+      description: Create tanent device map
+      summary: Create tanent device map
       security:
         - bearerAuth: []
       requestBody:
@@ -321,8 +321,8 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tdmap/devices/{uuid}:
     put:
-      description: update tanent device map by UUID
-      summary: update tanent device map by UUID
+      description: Update tanent device map by UUID
+      summary: Update tanent device map by UUID
       security:
         - bearerAuth: []
       parameters:
@@ -391,8 +391,8 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tdmap/{id}:
     put:
-      description: update single tenant device map
-      summary: update single tenant device map
+      description: Update single tenant device map
+      summary: Update single tenant device map
       security:
           - bearerAuth: []
       parameters:
@@ -428,8 +428,8 @@ paths:
                 schema:
                   $ref: '#/components/schemas/Error'
     delete:
-      description: delete single tenant device map
-      summary: delete single tenant device map
+      description: Delete single tenant device map
+      summary: Delete single tenant device map
       security:
           - bearerAuth: []
       parameters:
@@ -455,8 +455,8 @@ paths:
                   $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/mapcount:
     get:
-      description: get tenant device map count
-      summary: get tenant device map count
+      description: Get tenant device map count
+      summary: Get tenant device map count
       security:
           - bearerAuth: []
       responses:
@@ -482,7 +482,8 @@ paths:
     post:
       security:
         - bearerAuth: []
-      summary: create tanent device map
+      summary: Create tanent device map
+      description: Create tanent device map
       requestBody:
         content:
           multipart/form-data:
@@ -512,7 +513,8 @@ paths:
     get:
       security:
         - bearerAuth: []
-      summary: create tanent device map
+      summary: Create tanent device map
+      description: Create tanent device map
       parameters:
         - name: page
           in: query
@@ -554,7 +556,6 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
-
 
 components:
   securitySchemes:
