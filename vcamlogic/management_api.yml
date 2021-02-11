@@ -1,17 +1,19 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'vcamlogic Management APIs'
-  description: 'API for managing  virtual camera logic'
+  title: 'Vcamlogic Mnagement API'
+  description: 'API for managing  virtual camera logic configuration.
+                To get and update vcam devices. Get device by ID.
+                Update slot configuration for particular device.'
   contact:
-    name: Dhruvit Patel
-    url: smardtv.com
+    name: Edgeway
+    email: devops.vep@smardtv.com
 
 servers:
-  - url: https://smarthing-cloud-dev.com
+  - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-
-  - url: https://smarthing-cloud.com
+  
+  - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
 paths:
@@ -19,6 +21,10 @@ paths:
     get:
       description: |
         Get device list.
+      summary: |
+        Get device list.
+      security:
+      - bearerAuth: []
       parameters:
         - name: page
           in: query
@@ -51,7 +57,10 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     put:
-      description: update devices
+      description: Update devices
+      summary: Update devices
+      security:
+      - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -74,9 +83,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/management/v1/vcamlogic/devices/{did}/vcams/commands:
-    description: update vcam device commands
+    description: Update vcam device commands
     put:
-      description: update vcam device commands
+      summary: Update vcam device commands
+      description: Update vcam device commands
+      security:
+      - bearerAuth: []
       parameters:
         - in: path
           name: did
@@ -105,9 +117,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/management/v1/vcamlogic/devices/{did}:
-    description: get device by device ID
+    description: Get device by device ID
     get:
-      description: get device by device ID
+      summary: Get device by device ID
+      description: Get device by device ID
+      security:
+      - bearerAuth: []
       parameters:
         - in: path
           name: did
@@ -130,9 +145,12 @@ paths:
                 $ref: '#/components/schemas/Error'
 
   /api/management/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}:
-    description: update and get device camera slots.
+    description: Update and get device camera slots.
     put:
-      description: update and get device camera slots.
+      summary: Update and get device camera slots.
+      description: Update and get device camera slots.
+      security:
+      - bearerAuth: []
       parameters:
         - in: path
           name: did
@@ -153,7 +171,10 @@ paths:
         201:
           description: Success to update the camera slots.
     get:
-      description: get camera for device by deviceID, mac and index.
+      summary: Get camera for device by deviceID, mac and index.
+      description: Get camera for device by deviceID, mac and index.
+      security:
+      - bearerAuth: []
       parameters:
         - in: path
           name: did
@@ -185,17 +206,27 @@ paths:
                 $ref: '#/components/schemas/Error'
 
 components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Error:
-      description: Error descriptor.
       type: object
       properties:
         error:
-          description: Description of the error.
           type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
       example:
-        application/json:
-          error: "missing Authorization header"
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
 
     Camera:
       description: camera struct
@@ -311,7 +342,6 @@ components:
         status:
           type: string
         error:
-          type: object
           $ref: '#/components/schemas/error'
 
     vcams:
