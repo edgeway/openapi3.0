@@ -1,26 +1,28 @@
 openapi: '3.0.0'
 info:
   version: '1.0.0'
-  title: preference management API
-  description: |
-    An API for device attribute management and device grouping. Intended for use by the web GUI.
+  title: 'Preference management API'
+  description: 'Management API to manage preference configuration.
+                Get list of preferences server and particular server and attributes.
+                Add ,delete and update preference server'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
 
 servers:
-  - url: '{protocol}://trial.edgeway.io/{basePath}'
-    variables:
-      protocol:
-        enum: [http, https]
-        default: https
-      basePath: 
-        enum: [/api/management/v1/preferences/]
-        default: /api/management/v1/preferences/
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
 
 paths:
-  /servers:
+  /api/management/v1/preferences/servers:
     description: get server list by page number and number of entries per age
                 Add new server
     get:
       summary: Get list of servers
+      description: Get list of servers
       security:
         - bearerAuth: []
       parameters:
@@ -54,6 +56,10 @@ paths:
                 $ref: '#/components/schemas/Error'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
           content:
@@ -62,6 +68,7 @@ paths:
                 $ref: '#/components/schemas/Error'
     post:
       summary: Add new server
+      description: Add new server
       security:
         - bearerAuth: []
       requestBody:
@@ -82,16 +89,25 @@ paths:
           description: Succes to add new server with attributes
         400:
           description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
         500:
           description: Unexpected error
-  /server/{id}:
+  /api/management/v1/preferences/server/{id}:
     description: Getting information or sending for particular server
     get:
-      description: Getting information or sending for particular server
       security:
         - bearerAuth: []
+      description: Get server information from ID
+      summary: Get server information from ID
       parameters:
         - in: path
           name: id
@@ -108,12 +124,25 @@ paths:
                 $ref: '#/components/schemas/serverObject'
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
         500:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
     patch:
-      description: adding server attributes
+      description: Adding server attributes
+      summary: Adding server attributes
       security:
         - bearerAuth: []
       parameters:
@@ -138,12 +167,25 @@ paths:
                 $ref: '#/components/schemas/arrayOfServerAttributes'
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     delete:
-      description: delete server
+      description: Delete preferences server
+      summary: Delete preferences server
       security:
         - bearerAuth: []
       parameters:
@@ -165,14 +207,27 @@ paths:
           description: not found the keys
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
-  /servers/attributes:
-    description: get particular server atributes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/preferences/servers/attributes:
+    description: Get particular server atributes
     get:
-      description: get particular server atributes
+      summary: Get particular server atributes
+      description: Get particular server atributes
       parameters:
         - in: query
           name: type
@@ -193,10 +248,22 @@ paths:
                 $ref: '#/components/schemas/arrayOfServerAttributes'
         400:
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
 
@@ -212,12 +279,18 @@ components:
 
   schemas:
     Error:
-      description: Error descriptor
       type: object
       properties:
         error:
-          description: Description of the error
           type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
     serversGetObject:
       description: forming server object
       type: object
