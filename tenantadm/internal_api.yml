@@ -1,0 +1,433 @@
+openapi: '3.0.0'
+
+info:
+  version: '1.0.0'
+  title: 'Tenantadm Internal API'
+  description: 'An Internal API to manage Tenants.
+                Getting users of tenant and creating new tenant.
+                Getting particular tenants user and delete.
+                Verify and delete JWT tokens'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/management/v1/tenantadm/tenants:
+    get:
+      summary: get tenants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: username
+          in: query
+          description: username
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: get tanent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayTenant'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      description: provison tenant
+      summary: provison tenant
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: create tenant object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newTenantRequest'
+      responses:
+        200:
+          description: provision tanent success
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/tenants/token/{uuid}:
+    get:
+      description: get tenant token
+      summary: get tenant token
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: tanent device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayTenant'
+        400:
+          description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: status not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/users:
+    post:
+      description: create user
+      summary: create user
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+          201:
+            description: creating tanent user
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          422:
+            description: un-processable entity
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/tenants/{tid}/users/{uid}:
+    put:
+        description: update user
+        summary: update user
+        security:
+          - bearerAuth: []
+        parameters:
+          - in: path
+            name: tid
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: uid
+            required: true
+            schema:
+              type: string
+        requestBody:
+          description: updating user name
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserUpdate'
+        responses:
+          201:
+            description: update user
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          422:
+            description: un-processable entity
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+        description: delete user
+        summary: delete user
+        security:
+            - bearerAuth: []
+        parameters:
+          - in: path
+            name: tid
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: uid
+            required: true
+            schema:
+              type: string
+        responses:
+          201:
+            description: delete user
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/tokens:
+    delete:
+      description: delete token by token ID
+      summary: delete token by token ID
+      security:
+          - bearerAuth: []
+      parameters:
+        - in: query
+          name: tenant_id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: delete user
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/tdmap:
+    post:
+      description: add single tanent device map
+      summary: add single tanent device map
+      security:
+          - bearerAuth: []
+      requestBody:
+          description: sedning deviceMap object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantDeviceMap'
+      responses:
+          201:
+            description: same deviceMap would be return
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TenantDeviceMap'
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: status not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/auth/verify:
+    post:
+      description: JWT token validation
+      summary: JWT token validation
+      security:
+          - bearerAuth: []
+      responses:
+        201:
+          description: valid JWT token
+        401:
+          description: unauthorized request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    Tenant:
+      description: tanent object
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+        plan:
+          type: string
+        tenant_token:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    ArrayTenant:
+      description: array of tanent
+      type: array
+      items:
+        $ref: '#/components/schemas/Tenant'
+    newTenantRequest:
+      description: post object for tenant
+      type: object
+      properties:
+        tenant_id:
+          type: string
+    User:
+      description: tanent adm user struct
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        tenant_id:
+          type: string
+        auth0:
+          type: boolean
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+    UserUpdate:
+      description: user update method
+      type: object
+      properties:
+        name:
+          type: string
+        updated_ts:
+          type: string
+    TenantDeviceMap:
+      description: create tanent device map struct
+      type: object
+      properties:
+        id:
+          type: string
+        UUID:
+          type: string
+        public_key:
+          type: string
+        Tenant:
+          type: string
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
