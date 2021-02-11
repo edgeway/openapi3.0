@@ -1,44 +1,28 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'Configurations API'
-  description: 'APIs for Managing configurations service. APIs for flavors, configurations and  configurations map. Server to send configuration map to a device. '
+  title: 'Configurations Management API'
+  description: 'APIs for Managing configurations service. APIs for flavors, configurations 
+                and  configurations map. Server to send configuration map to a device. '
   contact:
-    name: Prabhu Chawandi
-    url: smardtv.com
-    email: prabhu.chawandi@smardtv.com
-    
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
 servers:
-  - url: https://smarthing-cloud-dev.com
+  - url: https://ewm-preprod.edgeway.io
     description: Dev Server
   
-  - url: http://smarthing-cloud.com
+  - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
-tags:
-  - name: config
-    description: Everything about configurations
-  - name: flavor
-    description: Everything about config flavors
-  - name: configmap
-    description: Everything about config and flavor maps
-
-x-tagGroups:
-  - name: Configurations
-    tags:
-      - config
-  - name: Flavors
-    tags:  
-      - flavor
-  - name: Configurations Map
-    tags:
-      - configmap
-paths: 
+  
+paths:
   /api/management/v1/configurations/configs/list:
     post:
-      tags: 
-        - config
       summary: API to create new configuration
+      description: API to create new configuration
+      security:
+      - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -71,9 +55,10 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     get:
-      tags: 
-        - config
       summary: Management API to list configurations
+      description: Management API to list configurations
+      security:
+      - bearerAuth: []
       responses:
         200:
           description: list of configurations
@@ -104,9 +89,10 @@ paths:
       
   /api/management/v1/configurations/configs/{configId}:
     get:
-      tags: 
-        - config
-      summary: get configuration by ID
+      summary: Get configuration by ID
+      description: Get configuration by ID
+      security:
+      - bearerAuth: []
       parameters: 
         - in: path
           name: configId
@@ -142,9 +128,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      tags: 
-        - config    
       description: Update the configuration
+      summary: Update the configuration
+      security:
+      - bearerAuth: []
       parameters: 
         - in: path
           name: configId
@@ -183,9 +170,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       
     delete:
-      tags: 
-        - config    
       description: Delete the configuration
+      summary: Delete the configuration
+      security:
+      - bearerAuth: []
       parameters: 
         - in: path
           name: configId
@@ -220,9 +208,10 @@ paths:
   
   /api/management/v1/configurations/configs/list/count:
     get:
-      tags: 
-        - config    
-      summary: get the count of configurtions
+      summary: Get the count of configurtions
+      description: Get the count of configurtions
+      security:
+      - bearerAuth: []
       responses:
         200:
           description: configurations count.
@@ -259,9 +248,10 @@ paths:
     
   /api/management/v1/configurations/configs/list/type/{type}:   
     get:
-      tags: 
-        - config    
-      summary: get configurations list by type
+      summary: Get configurations list by type
+      description: Get configurations list by type
+      security:
+      - bearerAuth: []
       parameters:
         - in: path
           name: type
@@ -299,9 +289,10 @@ paths:
 
   /api/management/v1/configurations/flavors/list:
     post:
-      tags: 
-        - flavor    
       summary: API to create new configuration flavor
+      description: API to create new configuration flavor
+      security:
+      - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -334,10 +325,10 @@ paths:
                 $ref: '#/components/schemas/Error'
 
     get:
-      tags: 
-        - flavor        
       summary: Management API to list configuration flavor
       description: API called by GUI to get the list of configurations flavors.
+      security:
+      - bearerAuth: []
       responses:
         200:
           description: list of configuration flavors
@@ -368,9 +359,10 @@ paths:
       
   /api/management/v1/configurations/flavors/{flavorId}:
     get:
-      tags: 
-        - flavor        
-      summary: get configuration flavor by ID
+      summary: Get configuration flavor by ID
+      description: Get configuration flavor by ID
+      security:
+      - bearerAuth: []
       parameters: 
         - in: path
           name: flavorId
@@ -406,9 +398,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      tags: 
-        - flavor        
-      description: Update the configuration flaovr
+      description: Update the configuration flavour
+      summary: Update the configuration flavour
+      security:
+      - bearerAuth: []
       parameters: 
         - in: path
           name: flavorId
@@ -447,9 +440,10 @@ paths:
                 $ref: '#/components/schemas/Error'
       
     delete:
-      tags: 
-        - flavor        
-      description: delete the configuration flavor
+      description: Delete the configuration flavor
+      summary: Delete the configuration flavor
+      security:
+      - bearerAuth: []
       parameters: 
         - in: path
           name: flavorId
@@ -484,9 +478,10 @@ paths:
   
   /api/management/v1/configurations/flavors/list/count:
     get:
-      tags: 
-        - flavor        
-      summary: get the count of configurtion flavors
+      summary: Get the count of configurtion flavors
+      description: Get the count of configurtion flavors
+      security:
+      - bearerAuth: []
       responses:
         200:
           description: configuration flavors count.
@@ -523,9 +518,10 @@ paths:
     
   /api/management/v1/configurations/flavors/list/type/{type}:   
     get:
-      tags: 
-        - flavor        
-      summary: get configuration flavors list by type
+      summary: Get configuration flavors list by type
+      description: Get configuration flavors list by type
+      security:
+      - bearerAuth: []
       parameters:
         - in: path
           name: type
@@ -563,11 +559,10 @@ paths:
 
   /api/management/v1/configurations/configmaps/{deviceId}:
     get:
-      tags: 
-        - configmap        
       summary: Management API to get the configuration and flavor map for the deviceId
       description: GUI API to get configuration map for the device chosen device Id
-        
+      security:
+      - bearerAuth: []
       parameters:
         - name: deviceId
           required: true
@@ -603,9 +598,10 @@ paths:
 
   /api/management/v1/configurations/configmaps/list:   
     get:
-      tags: 
-        - configmap    
-      summary: get configurations & flavors map list
+      summary: Get configurations & flavors map list
+      description: Get configurations & flavors map list
+      security:
+      - bearerAuth: []
       responses:
         200:
           description: array of configuration map object retured.
@@ -633,7 +629,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-      
+
+  /api/management/v1/configurations/configmaps/device/{id}:
+    put:
+      description: Update configuration map by device id
+      summary: Update configuration map by device id
+      security:
+      - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: configuration flavor ID
+          schema:
+            type: string
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Flavor'
+      responses:
+        201:
+          description: configuration updated.
+        404:
+          description: Status Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
 components:
 
   securitySchemes:
@@ -659,7 +692,7 @@ components:
           description: Request ID (same as in X-MEN-RequestID header).
           type: string
       example:
-        error: "failed to decode device group data: JSON payload is empty"
+        error: "Error string"
         request_id: "f7881e82-0492-49fb-b459-795654e7188a"
 
     Config:
