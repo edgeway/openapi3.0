@@ -1,0 +1,389 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Preferences internal API'
+  description: 'An internal API for Preferences management.
+                Getting and creating new Preference servers.
+                Get, update and delete the preferences server by ID.
+                Get preferences attributes from particular preference config.
+                '
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/internal/v1/preferences/tenants:
+    post:
+      summary: Create tenant
+      description: |
+        Create a tenant with provided configuration.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantNew"
+
+      responses:
+        201:
+          description: The tenant was created successfully.
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/preferences/servers:
+    description: Get server list by page number and number of entries per age
+                Add new server
+    get:
+      summary: Get list of servers
+      description: Get list of servers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Results page number
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: perPage
+          in: query
+          description: Number of results per page
+          required: false
+          schema:
+            type: integer
+            default: 20
+            maximum: 500
+      responses:
+        200:
+          description: An array of Preferences server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayofServers'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Add new server
+      description: Add new server
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Create new server entry
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serversObject'
+      responses:
+        200:
+          description: Success to add new server with attributes,
+                       returns non overridable attributes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
+        201:
+          description: Succes to add new server with attributes
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/preferences/server/{id}:
+    description: Getting information or sending for particular server
+    get:
+      description: Get server information from ID
+      summary: Get server information from ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: Succes to get server handler
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serverObject'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      description: Adding server attributes
+      summary: Adding server attributes
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+      requestBody:
+        description: create server object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/arrayOfServerAttributes'
+      responses:
+        200:
+          description: Succes to upsert server attribute
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      description: Delete preference server
+      summary: Delete preference server
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: server ID
+          schema:
+            type: string
+        - in: query
+          name: keys
+          required: false
+          schema:
+            type: string
+      responses:
+        200:
+          description: Succes to delete server
+        204:
+          description: not found the keys
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/preferences/servers/attributes:
+    description: Get particular server atributes
+    get:
+      description: Get attributes from particular preference server
+      summary: Get attributes from particular preference server
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: instance
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Succes to get server attribute
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    UnauthorizedError:
+      description: Access token in missing or invalid
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    TenantNew:
+      description: Tenant configuration.
+      type: object
+      properties:
+        tenant_id:
+          description: ID of given tenant.
+          type: string
+      example:
+        tenant_id: "1234"
+    serversGetObject:
+      description: forming server object
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        instance:
+          type: string
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/serverAttribute'
+    ArrayofServers:
+      description: array of servers
+      type: array
+      items:
+        $ref: '#/components/schemas/serversGetObject'
+    serverAttribute:
+      description: create object for sever attributes
+      type: object
+      properties:
+        name:
+          type: string
+          description: attribute name
+        description:
+          type: string
+          description: description of array index
+        value:
+          type: string
+          description: values such as ip address, mac address
+        override:
+          type: boolean
+    arrayOfServerAttributes:
+      description: Array of server attributes
+      type: array
+      items:
+        $ref: '#/components/schemas/serverAttribute'
+    serversObject:
+      description: forming server object
+      type: object
+      properties:
+        type:
+          type: string
+        instance:
+          type: string
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/serverAttribute'
+    serverObject:
+      description: forming server object
+      type: object
+      $ref: '#/components/schemas/serversGetObject'
