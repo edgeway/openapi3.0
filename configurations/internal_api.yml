@@ -1,0 +1,421 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Configurations Internal API'
+  description: 'APIs for Managing internal configurations service. APIs for flavors, configurations 
+                and  configurations map. Server to send configuration map to a device. '
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+
+paths:
+  /api/internal/v1/configurations/configmaps:
+    post:
+      summary: Internal API to send config maps
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevConfigMap'
+      responses:
+        200:
+          description: configuration map
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v1/configurations/configmaps/{id}:
+    delete:
+      summary: Delete config maps by id
+      description: Delete config maps by id
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: on success to remove the config map.
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update config maps by id
+      description: Update config maps by id
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevConfigMap'
+      responses:
+        200:
+          description: On success of adding new config map.
+        204:
+          description: on success to update config map.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/configurations/configs:
+    post:
+      description: Add device config.
+      summary: Add device config.
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevConf'
+      responses:
+        200:
+          description: On success of adding new config map.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/configurations/flavors:
+    post:
+      description: Add configuration flavour
+      summary: Add configuration flavour
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigFlavor'
+      responses:
+        200:
+          description: On success of adding new config map.
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/configurations/devices/{id}:
+    get:
+      description: Get all configurations
+      summary: Get all configurations
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: All configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllConfigurations'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/internal/v1/configurations/tenants:
+    post:
+      description: Create tenant handler
+      summary: Create tenant handler
+      security:
+      - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/newTenantRequest'
+      responses:
+        201:
+          description: created
+        400:
+          description: Missing/malformed request parameters or body. See error for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token in missing or invalid
+
+  schemas:
+
+    Error:
+      description: Error descriptor.
+      type: object
+      properties:
+        error:
+          description: Description of the error.
+          type: string
+        request_id:
+          description: Request ID (same as in X-MEN-RequestID header).
+          type: string
+      example:
+        error: "Error string"
+        request_id: "f7881e82-0492-49fb-b459-795654e7188a"
+
+    AiPackage:
+      description: ai package struct
+      type: object
+      properties:
+        name:
+          description: name
+          type: string
+        package_id:
+          description: package id
+          type: string
+
+    ArrayOfAiPackage:
+      description: array of ai package struct
+      type: array
+      items:
+        $ref: '#/components/schemas/AiPackage'
+
+    DevConfigMap:
+      description: device configuration map
+      type: object
+      properties:
+        id:
+          description: DB assigned ID
+          type: string
+        device_id:
+          description: device id
+          type: string
+        type:
+          description: flavour type
+          type: string
+        uuid:
+          description: unique identity
+          type: string
+        config_id:
+          description: configuration id
+          type: string
+        configflvr_id:
+          description: configuration flavour id
+          type: string
+        config_name:
+          description: configuration name
+          type: string
+        flavor_name:
+          description: flavour name
+          type: string
+        unique_devparams:
+          description: device param
+          type: string
+        ai_packages:
+          description: ai package
+          $ref: '#/components/schemas/ArrayOfAiPackage'
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
+
+    DevConf:
+      description: device configuration
+      type: object
+      properties:
+        id:
+          description: DB assigned ID
+          type: string
+        name:
+          description: flavour name
+          type: string
+        type:
+          description: flavour type
+          type: string
+        refs:
+          description: configuration name
+          type: integer
+        config_details:
+          description: flavour name
+          type: string
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
+
+    ConfigFlavor:
+      description: config flavour
+      type: object
+      properties:
+        id:
+          description: DB assigned ID
+          type: string
+        name:
+          description: flavour name
+          type: string
+        type:
+          description: flavour type
+          type: string
+        refs:
+          description: configuration name
+          type: integer
+        container:
+          description: container
+          type: string
+        created_ts:
+          type: string
+          format: datetime
+          description: Created timestamp
+        updated_ts:
+          type: string
+          format: datetime
+          description: Updated timestamp
+
+    AllConfigurations:
+      description: all device configurations
+      type: object
+      properties:
+        device_id:
+          description: device id
+          type: string
+        ai_packages:
+          $ref: '#/components/schemas/ArrayOfAiPackage'
+        configuration:
+          $ref: '#/components/schemas/Config'
+        flavor:
+          $ref: '#/components/schemas/Flavor'
+        unique_devparams:
+          description: unique dvice param
+          type: string
+
+    Flavor:
+      description: flavour config
+      properties:
+        name:
+          description: flavour name
+          type: string
+        type:
+          description: flavour type
+          type: string
+        container:
+          description: container
+          type: string
+
+    Config:
+      description: flavour config
+      properties:
+        name:
+          description: flavour name
+          type: string
+        type:
+          description: flavour type
+          type: string
+        config_details:
+          description: config details
+          type: string
+
+    newTenantRequest:
+      description: tenant config
+      properties:
+        tenant_id:
+          description: tenant id
+          type: string
