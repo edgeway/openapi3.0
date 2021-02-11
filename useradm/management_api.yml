@@ -42,19 +42,19 @@ paths:
         400:
           description: Bad request, see error message for details.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         401:
           description: Unauthorized.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         500:
           description: Internal server error.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /api/management/v1/useradm/users:
@@ -78,13 +78,13 @@ paths:
           description: |
             The user cannot be granted authentication.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         500:
           description: Internal server error.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
@@ -352,6 +352,10 @@ paths:
                 $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/management/v1/useradm/auth/verify:
     description: Verify link sent on mail of user
@@ -421,6 +425,10 @@ paths:
                 $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
   /api/management/v1/useradm/auth/users/{id}/role:
     description: Get the role by id
