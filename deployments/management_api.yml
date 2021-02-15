@@ -114,15 +114,6 @@ paths:
         and the 422 Unprocessable Entity status code will be returned.
       security:
       - bearerAuth: []
-      parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       requestBody:
         description: New deployment that needs to be created.
         content:
@@ -166,14 +157,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: id
         in: path
         description: Deployment identifier.
@@ -216,14 +199,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: deployment_id
         in: path
         description: Deployment identifier.
@@ -281,14 +256,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: deployment_id
         in: path
         description: Deployment identifier
@@ -332,14 +299,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: deployment_id
         in: path
         description: Deployment identifier.
@@ -381,14 +340,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: deployment_id
         in: path
         description: Deployment identifier.
@@ -431,14 +382,6 @@ paths:
         required: true
         schema:
           type: string
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       responses:
         204:
           description: Device was removed
@@ -457,14 +400,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: name
         in: query
         description: Release name filter.
@@ -583,15 +518,6 @@ paths:
         Upload mender artifact. Multipart request with meta and artifact.
 
         Supports artifact (versions v1, v2)[https://docs.mender.io/development/architecture/mender-artifacts#versions].
-      parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       requestBody:
         content:
           multipart/form-data:
@@ -640,14 +566,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: id
         in: path
         description: Artifact identifier.
@@ -704,14 +622,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: id
         in: path
         description: Artifact identifier.
@@ -762,14 +672,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: id
         in: path
         description: Artifact identifier.
@@ -809,14 +711,6 @@ paths:
       security:
       - bearerAuth: []
       parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       - name: id
         in: path
         description: Artifact identifier.
@@ -856,15 +750,6 @@ paths:
         If the limit value is 0 it means there is no limit for storage for logged in user.
       security:
       - bearerAuth: []
-      parameters:
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       responses:
         200:
           description: Successful response.
