@@ -201,14 +201,6 @@ paths:
         required: true
         schema:
           type: string
-      - name: Authorization
-        in: header
-        description: Contains the JWT token issued by the User Administration and
-          Authentication Service.
-        required: true
-        schema:
-          type: string
-          format: Bearer [token]
       requestBody:
         content:
           multipart/form-data:
