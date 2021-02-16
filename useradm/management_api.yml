@@ -23,6 +23,8 @@ paths:
       description: |
         Accepts user credentials via standard Basic Auth, and returns a
         JWT token to be used for authentication in subsequent requests.
+      security:
+      - basicAuth: []
       responses:
         200:
           description: |
@@ -499,6 +501,8 @@ paths:
     get:
       description: Auth0 login
       summary: Auth0 login
+      security: 
+      - auth0: []
       responses:
         303:
           description: On success redirected to verify email
@@ -535,6 +539,17 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    basicAuth:     # <-- arbitrary name for the security scheme
+      type: http
+      scheme: basic
+    auth0:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: 'https://dev-0000-x000.auth0.com/oauth/authorize'
+          tokenUrl: 'https://dev-0000-x000.auth0.com/oauth/token'
+          scopes:
+            {}
 
   schemas:
     UserNew:
