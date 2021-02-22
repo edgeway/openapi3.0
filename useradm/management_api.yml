@@ -25,6 +25,12 @@ paths:
         JWT token to be used for authentication in subsequent requests.
       security:
       - basicAuth: []
+      requestBody:
+        required: false
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/recaptchaCode'
       responses:
         200:
           description: |
@@ -49,6 +55,12 @@ paths:
                 $ref: '#/components/schemas/Error'
         401:
           description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        429:
+          description: Max continuous flase attempt tried
           content:
             application/json:
               schema:
@@ -501,7 +513,7 @@ paths:
     get:
       description: Auth0 login
       summary: Auth0 login
-      security: 
+      security:
       - auth0: []
       responses:
         303:
@@ -624,7 +636,7 @@ components:
       description: Error descriptor.
       example:
         application/json:
-          error: missing Authorization header
+          error: Error string
           request_id: f7881e82-0492-49fb-b459-795654e7188a
     Settings:
       type: object
@@ -644,4 +656,14 @@ components:
       type: object
       properties:
         role:
+          type: string
+
+    recaptchaCode:
+      description: This is only required to sent if user has tried
+                   continuous flase login more than 3 times.
+                   UI will display captcha code else UI will not display
+                   the field for entering captcha code.
+      type: object
+      properties:
+        captchacode:
           type: string
