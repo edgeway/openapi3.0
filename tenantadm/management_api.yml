@@ -41,6 +41,7 @@ paths:
             type: integer
             default: 20
             maximum: 500
+
       responses:
         200:
           description: An array of devices.
@@ -50,6 +51,12 @@ paths:
                 $ref: '#/components/schemas/ArrayofTanent'
         400:
           description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
           content:
             application/json:
               schema:
@@ -90,6 +97,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -111,6 +124,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/tanentCountObj'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -147,6 +166,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -174,6 +199,12 @@ paths:
       responses:
         204:
           description: succes to delete tanent
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: tanent not found
           content:
@@ -199,6 +230,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tenant'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -231,10 +268,23 @@ paths:
             schema:
               $ref: '#/components/schemas/TenantUser'
       responses:
+        200:
+          description: Success to add new server with attributes,
+                       returns non overridable attributes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/arrayOfServerAttributes'
         201:
           description: user created
         400:
           description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
           content:
             application/json:
               schema:
@@ -266,6 +316,12 @@ paths:
                 $ref: '#/components/schemas/ArrayTenantUser'
         400:
           description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
           content:
             application/json:
               schema:
@@ -307,6 +363,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: status not found
           content:
@@ -329,6 +391,7 @@ paths:
         - in: path
           name: uuid
           required: true
+          description: tenant ID
           schema:
             type: string
       requestBody:
@@ -341,6 +404,12 @@ paths:
           description: updated device maps for given UUID
         400:
           description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
           content:
             application/json:
               schema:
@@ -373,6 +442,12 @@ paths:
           description: device maps updated
         400:
           description: bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
           content:
             application/json:
               schema:
@@ -415,6 +490,12 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           404:
             description: status not found
             content:
@@ -441,6 +522,12 @@ paths:
       responses:
           201:
             description: device maps deleted
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           404:
             description: status not found
             content:
@@ -466,6 +553,12 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/tanentCountObj'
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           404:
             description: status not found
             content:
@@ -494,6 +587,12 @@ paths:
             description: device maps updated
           400:
             description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
             content:
               application/json:
                 schema:
@@ -540,6 +639,12 @@ paths:
                   $ref: '#/components/schemas/ArrayTenantDeviceMap'
           400:
             description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
             content:
               application/json:
                 schema:
@@ -599,6 +704,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -645,6 +756,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -690,6 +807,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -739,6 +862,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -785,6 +914,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         404:
           description: not found
           content:
@@ -800,6 +935,8 @@ paths:
   /api/management/v1/tenantadm/{id}/servers/attributes:
     description: Get particular server atributes
     get:
+      security:
+        - bearerAuth: []
       description: Get particular server atributes
       summary: Get particular server atributes
       parameters:
@@ -832,8 +969,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
         404:
           description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/tenantadm/tenants/{id}/download/ewxconf:
+    description: Download the EWC config.
+    get:
+      security:
+        - bearerAuth: []
+      summary: Get EWC config for Tenant.
+      parameters:
+        - in: path
+          name: id
+          description: Tenant ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+            description: Succes to get EWC config.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/EWCConf'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
           content:
             application/json:
               schema:
@@ -1035,3 +1216,46 @@ components:
       description: forming server object
       type: object
       $ref: '#/components/schemas/serversGetObject'
+    
+    EWM:
+      type: object
+      properties:
+        url:
+          type: string
+        mqPort:
+          type: string
+    
+    PortRangeDowld:
+      type: object
+      properties:
+        start:
+          type: string
+        end:
+          type: string
+
+    Ports:
+      type: object
+      properties:
+        onvif_port_range:
+          $ref: '#/components/schemas/PortRangeDowld'
+        rtsp_port_range:
+          $ref: '#/components/schemas/PortRangeDowld'
+        webpage_port_range:
+          $ref: '#/components/schemas/PortRangeDowld'
+
+    EWCConf:
+      description: JSON object for EWC cofniguration.
+      type: object
+      properties:
+        api_key:
+          type: string
+        tenant_id:
+          type: string
+        ewm:
+          $ref: '#/components/schemas/EWM'
+        infraType:
+          type: string
+        domain:
+          type: string
+        ports:
+          $ref: '#/components/schemas/Ports'
