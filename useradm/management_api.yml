@@ -577,11 +577,15 @@ components:
         password:
           type: string
           description: Password.
+        role:
+          type: string
+          description: Role must be admin or viewer.
       description: New user descriptor.
       example:
         application/json:
-          email: user@acme.com
-          password: mypass1234
+          email: new_email@acme.com
+          password: Abcsdf@128#$
+          role: admin
     UserUpdate:
       type: object
       properties:
@@ -591,10 +595,15 @@ components:
         password:
           type: string
           description: Password.
+        role:
+          type: string
+          description: Role must be admin or viewer.
       description: Update user information.
       example:
         application/json:
           email: new_email@acme.com
+          password: Abcsdf@128#$
+          role: admin
     User:
       required:
       - email
