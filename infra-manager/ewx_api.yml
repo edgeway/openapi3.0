@@ -1,0 +1,226 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'Infra-manager EWx API'
+  description: 'An EWx api to update the infrastructure'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/edgeway/ewc/v1/infra_manager/infrastructure/status:
+    put:
+      description: Update Infrastructure Status.
+                    Tenant ID is being taken from the JWT.
+      summary: Update Infrastructure Status.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
+      responses:
+          200:
+            description: Update Infrastructure Status success.
+          400:
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: No infrastructure exist.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewc/v1/infra_manage/infrastructure:
+    description: Update infrastructure from EWC
+                  Tenant ID is being taken from the JWT.
+    put:
+      summary: Update Infrastructure.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+                  $ref: '#/components/schemas/EWCInfrastructure'
+      responses:
+          200:
+            description: Update infrastructure success.
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    InfrastructureUrl:
+      description: Infrastructure domain name
+      type: object
+      properties:
+        domain_name:
+          type: string
+      example: {"domain_name":"ewm-prep.edgeway.io"}
+    onvifRtspPortRange:
+      description: onvif port ranges object
+      type: object
+      properties:
+        start:
+          type: number
+        end:
+          type: number
+
+    GetInfraStructuresObj:
+      description: get infrastructure object
+      type: object
+      properties:
+        name:
+          type: string
+        instance_id:
+          type: string
+        public_ip:
+          type: string
+        onvif_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        created_ts:
+          type: string
+        updated_ts:
+          type: string
+
+    error:
+      type: object
+      properties:
+        state:
+          type: string
+        msg:
+          type: string
+
+    EwcServer:
+      type: object
+      properties:
+        uptime:
+          type: string
+        restartCount:
+          type: string
+        status:
+          type: string
+        error:
+          $ref: '#/components/schemas/error'
+
+    bridgeMgr:
+      type: object
+      properties:
+        uptime:
+          type: string
+        restartCount:
+          type: string
+        status:
+          type: string
+        error:
+          $ref: '#/components/schemas/error'
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        
+    Status:
+      description: infrastructure Status
+      type: object
+      properties:
+        ewcVersion:
+          type: string
+        protocolVersion:
+          type: string
+        ewcServer:
+          $ref: '#/components/schemas/EwcServer'
+        bridgeMgr:
+          $ref: '#/components/schemas/bridgeMgr'
+    
+    IP:
+      description: Public and private IP
+      type: object
+      properties:
+        public:
+          type: string
+        private:
+          type: string
+
+    Ports:
+      description: Onvif, RTSP, Webpage port range
+      type: object
+      properties:
+        onvif_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+
+    EWCInfrastructure:
+      description: Update infrastructure.
+      properties:
+        infraType:
+          type: string
+        ip:
+          $ref: '#/components/schemas/IP'
+        ports:
+          $ref: '#/components/schemas/Ports'
+
+        
