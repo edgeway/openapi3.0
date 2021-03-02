@@ -1,0 +1,84 @@
+openapi: '3.0.0'
+
+info:
+  version: '1.0.0'
+  title: 'Tenantadm EWx API'
+  description: 'EWC API to authenticate the EWC requests'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/edgeway/ewc/v1/tenantadm/tenants/auth/ewx:
+    description: Validate API key
+    get:
+      summary: Validate API key
+      description: Validate API key
+      parameters:
+        - name: apikey
+          in: query
+          description: apikey
+          required: true
+          schema:
+            type: string
+        - name: domainname
+          in: query
+          description: domainname
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Return JWT on successful verification.
+          content:
+            application/jwt:
+              example: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9. eyJleHAiOjE0NzYxMTkxMzYsImlzcyI6Ik1lbmRlciIsIn
+                N1YiI6Ijg1NGIzMTA5LTQ4NjItNGEyNS1hMWZiLWYxMTE2 MWNlN2E4NCIsInNjcCI6WyJtZW5kZXIuKiJdfQ.
+                X7Ief4PhPLlR6mA2wh3G3K0Z2tud0rK1QJesxu52NfICSe ARmlujczs-_1YZxMwI0s-HgpXHbXIjaSVK80BjxjAM1rqp
+                RGvgqSqG-dU5KmglDpAaTr4VaJci3VFPlVUVTRpI7bfqNM nKZtjmOUAGwjvroDUwX1RwayEmms-efGI
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised EWC API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'failed to decode device group data: JSON payload is empty'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
