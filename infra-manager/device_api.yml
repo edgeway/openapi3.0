@@ -10,26 +10,31 @@ info:
 servers:
   - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-  
+
   - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
 paths:
   /api/edgeway/ewv/v1/infra_manager/infrastructure:
     get:
-      description: Get domain name from insfrastructure
-      summary: Get domain name from insfrastructure
+      description: Get domain name from insfrastructure for particular tenant
+      summary: Get domain name from insfrastructure for particular tenant
       security:
         - bearerAuth: []
       responses:
           200:
             description: infrastructurs object
                           This will be returned on if infrastructure is present.
-                          Or Empty object return if infrastructure not available.
             content:
               application/json:
                 schema:
                   $ref: '#/components/schemas/InfrastructureUrl'
+          400:
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
           401:
             description: Authorization failed
             content:
