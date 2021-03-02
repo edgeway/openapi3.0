@@ -79,6 +79,172 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/internal/v1/infra/tenants/{tid}:
+    description: Get, Create, Delete and Update infrastructure using Tenant ID
+    get:
+      summary: Get infrastructure using Tenant ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: tid
+          schema:
+            type: string
+      responses:
+          200:
+            description: infrastructurs response object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/getInfraStructuresObj'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    post:
+      summary: Create Infrastructre
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: tid
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InfraStructuresObj'
+      responses:
+          200:
+            description: Infrastructurs created successfully.
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete infrastructure using Tenant ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: tid
+          schema:
+            type: string
+      responses:
+          201:
+            description: Infrastructurs deleted successfully.
+          400:
+            description: Bad request.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/internal/v1/infra/servers/instance/{id}/ports:
+    description: Update infrastructure Ports by instance ID
+    put:
+      summary: Update Ports.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          required: true
+          name: id
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePorts'
+      responses:
+          201:
+            description: Infrastructurs ports updated successfully.
+          400:
+            description: Bad request.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: Infrastructure not found.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/internal/v1/infra/servers:
+    description: Get infrastructure server status by host name or public IP
+    get:
+      summary: Get infrastructure by using host name or public IP
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: host
+          schema:
+            type: string
+      responses:
+          200:
+            description: infrastructurs response object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Status'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
 
 components:
   securitySchemes:
@@ -132,3 +298,85 @@ components:
       properties:
         tenant_id:
           type: string
+
+    error:
+      type: object
+      properties:
+        state:
+          type: string
+        msg:
+          type: string
+
+    EwcServer:
+      type: object
+      properties:
+        uptime:
+          type: string
+        restartCount:
+          type: string
+        status:
+          type: string
+        error:
+          $ref: '#/components/schemas/error'
+
+    bridgeMgr:
+      type: object
+      properties:
+        uptime:
+          type: string
+        restartCount:
+          type: string
+        status:
+          type: string
+        error:
+          $ref: '#/components/schemas/error'
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        
+    Status:
+      description: infrastructure Status
+      type: object
+      properties:
+        ewcVersion:
+          type: string
+        protocolVersion:
+          type: string
+        ewcServer:
+          $ref: '#/components/schemas/EwcServer'
+        bridgeMgr:
+          $ref: '#/components/schemas/bridgeMgr'
+
+    InfraStructuresObj:
+      description: Post Infrastructure object.
+      type: object
+      properties:
+        name:
+          type: string
+        tenant_id:
+          type: string
+        type:
+          description: EWC or EWI
+          type: string
+        domain_name:
+          type: string
+        onvif_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        rtsp_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+    
+    UpdatePorts:
+      description: Update infrastructure ports.
+      type: object
+      properties:
+        free_onvif_ports:
+          type: integer
+        free_rtsp_ports:
+          type: integer
+        altd_onvif_ports:
+          type: integer
+        altd_rtsp_ports:
+          type: integer
+        altd_webpage_ports:
+          type: integer
