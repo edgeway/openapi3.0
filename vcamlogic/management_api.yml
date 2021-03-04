@@ -44,18 +44,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ArrayDevice'
         400:
-          description: Missing or malformed request parameters.
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         500:
-          description: Unexpected error.
+          description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
     put:
       description: Update devices
       summary: Update devices
@@ -70,13 +81,25 @@ paths:
         201:
           description: Success to update devices.
         400:
-          description: Missing or malformed request parameters.
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         500:
-          description: Unexpected error.
+          description: Unexpected error
           content:
             application/json:
               schema:
@@ -109,6 +132,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error.
           content:
@@ -132,13 +161,31 @@ paths:
       responses:
         200:
           description: Success to get device.
-                       And also on no device found by ID
+                       And also on no device found by ID will have Empty object.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/getDevice'
+        400:
+          description: Missing or malformed request parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+            description: Unauthorised access.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
-          description: Unexpected error.
+          description: Unexpected error
           content:
             application/json:
               schema:
@@ -170,6 +217,18 @@ paths:
       responses:
         201:
           description: Success to update the camera slots.
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
     get:
       summary: Get camera for device by deviceID, mac and index.
       description: Get camera for device by deviceID, mac and index.
@@ -198,12 +257,120 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Camera'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/tenants/{tid}/devices:
+    description: Update vcam status for all the devices in the tenant.
+    put:
+      security:
+        - bearerAuth: []
+      description: Update vcam status for all the devices in the tenant.
+      parameters:
+        - in: path
+          name: tid
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vcams'
+      responses:
+        201:
+          description: Update successful.
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}/type:
+    description: Update type of virtual camera.
+    put:
+      description: Update type of virtual camera.
+      summary: Update type of virtual camera.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: did
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: mac
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: idx
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/vcamType'
+      responses:
+        201:
+          description: Update successful.
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 
 components:
 
@@ -262,7 +429,7 @@ components:
           type: string
         info:
           type: string
-
+      example: {"slot_index":7,"uuid":"e37448c4-13dc-4361-a89e-f5b0c08622b3","mac":"00:07:5f:b3:e7:77","camera_brand":"Bosch","camera_model":"FLEXIDOME IP micro 3000i","user_name":"admin","password":"Aveiro-35","type":"","public_ip":"","private_ip":"","cameraTestedStatus":2,"onvif_port":7507,"onvif_url":"http://smart-ewc.edgeway.io:7507/onvif/device_service","rtsp_port":7707,"rtsp_url":"rtsp://smart-ewc.edgeway.io:7707/proxyStreamer_profile_1","rtsp_channels":[{"profileName":"H26x_L1S1","rtspUrl":"rtsp://192.168.1.199/rtsp_tunnel?p=0\u0026h26x=4\u0026vcd=2","codec":"H264","resolution":3072,"fps":20},{"profileName":"H26x_L1S2","rtspUrl":"rtsp://192.168.1.199/rtsp_tunnel?p=1\u0026inst=2\u0026h26x=4","codec":"H264","resolution":3072,"fps":20},{"profileName":"JPEG_L1S3","rtspUrl":"rtsp://192.168.1.199/rtsp_tunnel?h26x=0","codec":"JPEG","resolution":3072,"fps":20}],"cameraNvrRecRtspPreferred":"H26x_L1S1","cameraAnalyzeRtspPreferred":"H26x_L1S1","info":{"uptime":0,"restartCount":0,"type":"","command":"","status":"","error":{"state":"","msg":""}}}
     ActiveCamera:
       description: active cameras
       properties:
@@ -315,6 +482,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Device'
+        example: [{"deviceId":"603e36e24d50c80001d46c35","deviceMAC":"","UUID":"54d1ac67-96fd-4b13-b672-2c1eaa1350fc","vcams":[{"slotIndex":1,"mac":"b4:a3:82:47:89:7f","cameraBrand":"HIKVISION","cameraModel":"DS-2CD2542FWD-IS","uuid":"8502f8e6-02ed-4702-87d9-f6f535c92e7c","userName":"adminHK","password":"Aveiro35HK","onvifPort":7501,"onvifUrl":"http://smart-ewc.edgeway.io:7501/onvif/device_service","rtspPort":7701,"RtspUrl":"rtsp://smart-ewc.edgeway.io:7701/proxyStreamer_profile_1","serverIP":"","cameraRtspChannels":[{"profileName":"mainStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/101?transportmode=unicast\u0026profile=Profile_1","codec":"H264","resolution":2688,"fps":25},{"profileName":"subStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/102?transportmode=unicast\u0026profile=Profile_2","codec":"H264","resolution":2688,"fps":25}],"cameraNvrRecRtspPreferred":"mainStream","cameraAnalyzeRtspPreferred":"mainStream","info":{"uptime":0,"restartCount":0,"type":"","command":"","status":"","error":{"state":"","msg":""}}}]}]
 
     error:
       description: vcam status error
@@ -399,3 +567,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/vcams'
+      example: '{"deviceId":"603e36e24d50c80001d46c35","deviceMAC":"","UUID":"54d1ac67-96fd-4b13-b672-2c1eaa1350fc","vcams":[{"slotIndex":1,"mac":"b4:a3:82:47:89:7f","cameraBrand":"HIKVISION","cameraModel":"DS-2CD2542FWD-IS","uuid":"8502f8e6-02ed-4702-87d9-f6f535c92e7c","userName":"adminHK","password":"Aveiro35HK","onvifPort":7501,"onvifUrl":"http://smart-ewc.edgeway.io:7501/onvif/device_service","rtspPort":7701,"RtspUrl":"rtsp://smart-ewc.edgeway.io:7701/proxyStreamer_profile_1","serverIP":"","cameraRtspChannels":[{"profileName":"mainStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/101?transportmode=unicast\u0026profile=Profile_1","codec":"H264","resolution":2688,"fps":25},{"profileName":"subStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/102?transportmode=unicast\u0026profile=Profile_2","codec":"H264","resolution":2688,"fps":25}],"cameraNvrRecRtspPreferred":"mainStream","cameraAnalyzeRtspPreferred":"mainStream","info":{"uptime":0,"restartCount":0,"type":"","command":"","status":"","error":{"state":"","msg":""}}}}]}'
+    
+    vcamType:
+      description: Vcam type.
+      type: object
+      properties:
+        type:
+          type: string
