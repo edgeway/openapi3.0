@@ -1222,7 +1222,7 @@ components:
       properties:
         url:
           type: string
-        mqPort:
+        rmqPort:
           type: string
     
     PortRangeDowld:
