@@ -32,7 +32,7 @@ paths:
             default: 1
       responses:
         200:
-          description: An array of Preferences server.
+          description: Rabbit mq config.
           content:
             application/json:
               schema:
