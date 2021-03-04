@@ -1,0 +1,106 @@
+openapi: '3.0.0'
+info:
+  version: '1.0.0'
+  title: 'Preference EWx API'
+  description: 'EWx API for getting the rabbitmq configuration'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/edgeway/ewc/v1/preferences/tenants/{tid}/rmqconf:
+    description: Get rabbitmq configuration.
+    get:
+      summary: Get rabbitmq configuration.
+      description: Get rabbitmq configuration.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tid
+          in: path
+          description: Tenant id
+          required: true
+          schema:
+            type: string
+            default: 1
+      responses:
+        200:
+          description: An array of Preferences server.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/vcamRmqConf'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    UnauthorizedError:
+      description: Access token in missing or invalid
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        error: 'Error string'
+        request_id: f7881e82-0492-49fb-b459-795654e7188a
+    
+    vcamRmqConf:
+      type: object
+      properties:
+        vhost:
+          type: string
+        user:
+          type: string
+        pwd:
+          type: string
+        exchange:
+          type: string
+        route_key:
+          type: string
+      example:
+        {"vhost":"/","user":"rabbitmq","pwd":"Edgeway999Platform","exchange":"cpm","route_key":"cpm.afca7616-3ce0-4deb-a729-775f0d07b2d0.fef70632-d6e1-48b2-82b9-42f0ae5cfb8d"}
