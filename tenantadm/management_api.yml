@@ -1030,7 +1030,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/management/v2/tenantadm/validate/uniquename/{name}:
+  /api/management/v2/tenantadm/validate/tenants/{name}:
     description: Validate name as per requirement.
                  Must not be already in use.
                  [0-9][a-z] length must not exceed 12
@@ -1072,7 +1072,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v2/tenantadm/validate/uniqueuuid/{uuid}:
+  /api/management/v2/tenantadm/validate/devices/{uuid}:
     description: Validate UUID, must be present in tenant db.
                  Must have publick key added.
                  No other tenant is using same device.
