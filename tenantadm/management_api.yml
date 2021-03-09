@@ -111,6 +111,10 @@ paths:
                 $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/management/v1/tenantadm/tenants/count:
     get:
       summary: Get the number of tanent
@@ -1026,6 +1030,84 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/management/v2/tenantadm/validate/uniquename/{name}:
+    description: Validate name as per requirement.
+                 Must not be already in use.
+                 [0-9][a-z] length must not exceed 12
+    post:
+      description: Validate tenant name.
+      summary: Validate tenant name.
+      parameters:
+        - in: path
+          name: name
+          required: true
+          description: Tenant name.
+          schema:
+            type: string
+      responses:
+        204:
+          description: Tenant name is valide as per the requirement.
+                       It is available for use.
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Already in Use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v2/tenantadm/validate/uniqueuuid/{uuid}:
+    description: Validate UUID, must be present in tenant db.
+                 Must have publick key added.
+                 No other tenant is using same device.
+    post:
+      description: Validate UUID.
+      summary: Validate UUID.
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: UUID is valid for use.
+        400:
+          description: Missing/malformed request params.
+                       Not present in the DB.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Already in Use or No public key assigned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1216,7 +1298,7 @@ components:
       description: forming server object
       type: object
       $ref: '#/components/schemas/serversGetObject'
-    
+
     EWM:
       type: object
       properties:
@@ -1224,7 +1306,7 @@ components:
           type: string
         rmqPort:
           type: string
-    
+
     PortRangeDowld:
       type: object
       properties:
@@ -1259,3 +1341,5 @@ components:
           type: string
         ports:
           $ref: '#/components/schemas/Ports'
+      example:
+        {"api_key":"$2a$10$ANLZNz9rr8qBWppXUR/tIOTDOaCQ9P.cTNGEo/TTVW8/8sr3XdHNS","tenant_id":"afca7616-3ce0-4deb-a729-775f0d07b2d0","ewm":{"url":"localhost","rmqPort":"5000"},"infraType":"ewc","domain":"smart-ewc.edgeway.io","ports":{"onvif_port_range":{"start":"7501","end":"7700"},"rtsp_port_range":{"start":"7701","end":"7900"},"webpage_port_range":{"start":"10001","end":"10010"}}}
