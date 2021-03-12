@@ -1107,6 +1107,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/management/v2/tenantadm/tenants/trial:
+    description: Auth0 login handler.
+                Sign-up and create new Tenant.
+    post:
+      description: Sign-up and create new Tenant.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrialTenant'
+      responses:
+        201:
+          description: Successfully sign-up and created tenant.
+        400:
+          description: Missing/malformed request params.
+                       Not present in the DB.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised Auth0 user.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Already in Use or No public key assigned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   securitySchemes:
@@ -1343,3 +1387,84 @@ components:
           $ref: '#/components/schemas/Ports'
       example:
         {"api_key":"$2a$10$ANLZNz9rr8qBWppXUR/tIOTDOaCQ9P.cTNGEo/TTVW8/8sr3XdHNS","tenant_id":"afca7616-3ce0-4deb-a729-775f0d07b2d0","ewm":{"url":"localhost","rmqPort":"5000"},"infraType":"ewc","domain":"smart-ewc.edgeway.io","ports":{"onvif_port_range":{"start":"7501","end":"7700"},"rtsp_port_range":{"start":"7701","end":"7900"},"webpage_port_range":{"start":"10001","end":"10010"}}}
+
+    Address:
+      description: Address information of tenant.
+      type: object
+      properties:
+        first_name:
+          type: string
+        family_name:
+          type: string
+        line1:
+          type: string
+        line2:
+          description: Line 2 address is non mendatory field.
+          type: string
+        country:
+          type: string
+        post_code:
+          type: string
+    TenantsInfo:
+      description: Tenants personal information.
+      type: object
+      properties:
+        address:
+          $ref: '#/components/schemas/Address'
+        phone_number:
+          type: integer
+        organization:
+          type: string
+
+    TrialTenant:
+      description: Tenant struct
+      type: object
+      properties:
+        email:
+          type: string
+        auth0:
+          description: Get from Auth0 login.
+          type: boolean
+        password:
+          type: string
+        tenant_name:
+          type: string
+        tos:
+          type: boolean
+          description: Get from Auth0 login.
+        plan:
+          type: string
+        UUID:
+          type: string
+        marketing:
+          type: string
+        g-recaptcha-response:
+          type: string
+        deployment_type:
+          type: integer
+          description: Deployment type can be 'SDTV hosted EWC' 1 or 'Customer hosted EWC' 2
+        tenant_info:
+          $ref: '#/components/schemas/TenantsInfo'
+
+      example: '{
+        "email":"test2@gmail.com",
+        "auth0": True,
+        "password": "abcd",
+        "tenant_name":"abc12346",
+        "tos": True,
+        "UUID":"0071d9c9-0b82-4602-aee0-4306436d87de",
+        "g-recaptcha-response":"goolecaptch",
+        "deployment_type": 2,
+        "tenant_info": {
+            "address":{
+                "first_name":"Abc",
+                "family_name": "Def",
+                "line1": "abd",
+                "country":"in",
+                "post_code":"123456",
+            },
+            "phone_number":123456,
+            "organization":"abcfdg",
+        },
+
+    }'
