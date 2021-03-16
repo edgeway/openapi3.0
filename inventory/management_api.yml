@@ -471,7 +471,7 @@ components:
       properties:
         id:
           type: string
-          description: Mender-assigned unique ID.
+          description: Edgeway-assigned unique ID.
         updated_ts:
           type: string
           description: Timestamp of the most recent attribute update.
