@@ -188,10 +188,10 @@ paths:
                 $ref: '#/components/schemas/Error'
   /api/internal/v1/deployments/tenants/{id}/artifacts:
     post:
-      summary: Upload mender artifact
+      summary: Upload Edgeway artifact
       description: |
-        Upload mender artifact to a specific tenant. Multipart request with meta and artifact.
-        Supports artifact (versions v1, v2)[https://docs.mender.io/development/architecture/mender-artifacts#versions].
+        Upload Edgeway artifact to a specific tenant. Multipart request with meta and artifact.
+        Supports artifact (versions v1, v2)[https://ewm-preprod-saas.edgeway.io/development/architecture/edgeway-artifacts#versions].
       security:
       - bearerAuth: []
       parameters:
