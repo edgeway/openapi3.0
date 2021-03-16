@@ -341,7 +341,7 @@ components:
       description: URL for artifact file download.
       example:
         application/json:
-          uri: http://mender.io/artifact.tar.gz.mender
+          uri: http://ewm-preprod-mt.edgeway.io/artifact.tar.gz.edgeway
           expire: 2016-10-29T10:45:34Z
   responses:
     InternalServerError:
