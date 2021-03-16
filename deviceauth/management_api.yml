@@ -613,7 +613,7 @@ components:
       properties:
         id:
           type: string
-          description: Mender assigned Device ID.
+          description: Edgeway assigned Device ID.
         id_data:
           type: string
           description: |-
