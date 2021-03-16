@@ -513,11 +513,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     post:
-      summary: Upload mender artifact
+      summary: Upload Edgeway artifact
       description: |
-        Upload mender artifact. Multipart request with meta and artifact.
+        Upload Edgeway artifact. Multipart request with meta and artifact.
 
-        Supports artifact (versions v1, v2)[https://docs.mender.io/development/architecture/mender-artifacts#versions].
+        Supports artifact (versions v1, v2)[https://docs.edgeway.io/development/architecture/edgeway-artifacts#versions].
       requestBody:
         content:
           multipart/form-data:
@@ -1080,7 +1080,7 @@ components:
       description: URL for artifact file download.
       example:
         application/json:
-          uri: http://mender.io/artifact.tar.gz.mender
+          uri: http://ewm-preprod-saas.edgeway.io/artifact.tar.gz.edgeway
           expire: 2016-10-29T10:45:34Z
     StorageLimit:
       required:
