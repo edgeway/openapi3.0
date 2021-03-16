@@ -529,7 +529,7 @@ components:
       properties:
         id:
           type: string
-          description: Mender assigned Device ID.
+          description: Edgeway assigned Device ID.
         identity_data:
           $ref: '#/components/schemas/IdentityData'
         status:
