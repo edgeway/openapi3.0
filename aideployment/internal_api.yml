@@ -1,0 +1,377 @@
+openapi: 3.0.1
+info:
+  version: '1.0.0'
+  title: 'AI Deployments Internal API'
+  description: 'Internal API of AI deployments service'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/internal/v1/aideployments/tenants/{id}/limits/storage:
+    get:
+      summary: Get storage limit and current storage usage for given tenant
+      description: |
+        Get storage limit and current storage usage for given tenant.
+        If the limit value is 0 it means storage space is unlimited
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Tenant ID
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StorageUsage'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Set storage limit for given tenant
+      description: |
+        Set storage limit for given tenant.
+        If the limit value is 0 it means storage space is unlimited
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Tenant ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StorageLimit'
+        required: true
+      responses:
+        204:
+          description: Limit information updated.
+          content: {}
+        400:
+          description: |
+            The request body is malformed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: limit
+  /api/internal/v1/aideployments/tenants:
+    post:
+      summary: Provision a new tenant
+      description: |
+        Sets up all tenant-related infrastructure, e.g. a migrated tenant's database.
+      security:
+      - bearerAuth: []
+      requestBody:
+        description: New tenant descriptor.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewTenant'
+        required: true
+      responses:
+        201:
+          description: Tenant was successfully provisioned.
+          content: {}
+        400:
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: tenant
+  /api/internal/v1/aideployments/tenants/{id}/deployments:
+    get:
+      summary: Get all deployments for specific tenant
+      description: |
+        Returns a filtered collection of deployments in the system,
+        including active and historical. If both 'status' and 'query' are
+        not specified, all devices are listed.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Tenant ID
+        required: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: AI Deployment status filter.
+        schema:
+          type: string
+          enum:
+          - inprogress
+          - finished
+          - pending
+      - name: search
+        in: query
+        description: AI Deployment name or description filter.
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Results page number
+        schema:
+          type: number
+          format: integer
+          default: 1.0
+      - name: created_before
+        in: query
+        description: List only deployments created before and equal to Unix timestamp
+          (UTC)
+        schema:
+          type: number
+          format: integer
+      - name: created_after
+        in: query
+        description: List only deployments created after and equal to Unix timestamp
+          (UTC)
+        schema:
+          type: number
+          format: integer
+      responses:
+        200:
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deployment'
+              example:
+              - created: 2016-02-11T13:03:17.063493443Z
+                status: finished
+                name: production
+                artifact_name: Application 0.0.1
+                id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
+                finished: 2016-03-11T13:03:17.063493443Z
+                device_count: 10
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/internal/v1/aideployments/tenants/{id}/artifacts:
+    post:
+      summary: Upload Edgeway artifact
+      description: |
+        Upload Edgeway artifact to a specific tenant. Multipart request with meta and artifact.
+        Supports artifact (versions v1, v2)[https://ewm-preprod-saas.edgeway.io/development/architecture/edgeway-artifacts#versions].
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Tenant ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - artifact
+              - size
+              properties:
+                size:
+                  type: integer
+                  description: Size of the artifact file in bytes.
+                  format: long
+                description:
+                  type: string
+                artifact:
+                  type: string
+                  description: Artifact. It has to be the last part of request.
+                  format: binary
+        required: true
+      responses:
+        201:
+          description: Artifact uploaded.
+          headers:
+            Location:
+              description: URL of the newly uploaded artifact.
+              schema:
+                type: string
+          content: {}
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        application/json:
+          error: 'Error string'
+          request_id: f7881e82-0492-49fb-b459-795654e7188a
+
+    NewTenant:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+          description: New tenant's ID.
+      description: New tenant descriptor.
+      example:
+        application/json:
+          tenant_id: 58be8208dd77460001fe0d78
+
+    StorageUsage:
+      required:
+      - limit
+      - usage
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: |
+            Storage limit in bytes. If set to 0 - there is no limit for storage.
+        usage:
+          type: integer
+          description: |
+            Current storage usage in bytes.
+      description: Tenant account storage limit and storage usage.
+      example:
+        application/json:
+          limit: 1073741824
+          usage: 536870912
+    StorageLimit:
+      required:
+      - limit
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: |
+            Storage limit in bytes. If set to 0 - there is no limit for storage.
+      description: Tenant account storage limit
+      example:
+        application/json:
+          limit: 1073741824
+    Deployment:
+      required:
+      - artifact_name
+      - created
+      - id
+      - name
+      - status
+      type: object
+      properties:
+        created:
+          type: string
+          format: date-time
+        name:
+          type: string
+        artifact_name:
+          type: string
+        id:
+          type: string
+        finished:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - inprogress
+          - pending
+          - finished
+        device_count:
+          type: integer
+        artifacts:
+          type: array
+          items:
+            type: string
+            description: An array of artifact's identifiers.
+      example:
+        application/json:
+          created: 2016-02-11T13:03:17.063493443Z
+          status: finished
+          name: production
+          artifact_name: Application 0.0.1
+          id: 00a0c91e6-7dec-11d0-a765-f81d4faebf6
+          finished: 2016-03-11T13:03:17.063493443Z
+  responses:
+    InternalServerError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidRequestError:
+      description: Invalid Request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: Not Found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnprocessableEntityError:
+      description: Unprocessable Entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

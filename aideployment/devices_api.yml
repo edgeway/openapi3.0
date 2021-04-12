@@ -1,0 +1,364 @@
+openapi: 3.0.1
+info:
+  version: '1.0.0'
+  title: 'AI Deployments Device API'
+  description: 'An API for device AI deployments. Intended for use by devices.
+    Devices can get new updates and send information about current AI deployment status.'
+  contact:
+    name: Edgeway
+    email: devops.vep@smardtv.com
+
+servers:
+  - url: https://ewm-preprod.edgeway.io
+    description: Dev Server
+  
+  - url: https://ewm-preprod-mt.edgeway.io
+    description: Prod Server
+
+paths:
+  /api/devices/v1/aideployments/device/deployments/next:
+    get:
+      summary: Get a next update
+      description: |
+        Returns a next update to be installed on the device.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: artifact_name
+        in: query
+        description: currently installed artifact
+        required: true
+        schema:
+          type: string
+      - name: device_type
+        in: query
+        description: Device type of device
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeploymentInstructions'
+              example:
+                id: w81s4fae-7dec-11d0-a765-00a0c91e6bf6
+                artifact:
+                  artifact_name: my-app-0.1
+                  source:
+                    uri: https://aws.my_update_bucket.com/image_123
+                    expire: 2016-03-11T13:03:17.063493443Z
+                  device_types_compatible:
+                  - rspi
+                  - rspi2
+                  - rspi0
+        204:
+          description: No updates for device.
+          content: {}
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/devices/v1/aideployments/device/deployments/{id}/status:
+    put:
+      summary: Update the device AI deployment status
+      description: |
+        Updates the status of a AI deployment on a particular device. Final status
+        of the AI deployment is required to be set to indicate the success or failure
+        of the installation process. The status can not be changed when AI deployment
+        status is set to aborted. Reporting of intermediate steps such as
+        installing, downloading, rebooting is optional.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: AI Deployment identifier.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: AI Deployment status.
+        content:
+          application/json:
+            schema:
+              required:
+              - status
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                  - installing
+                  - downloading
+                  - rebooting
+                  - success
+                  - failure
+                  - already-installed
+                substate:
+                  type: string
+                  description: Additional state information
+        required: true
+      responses:
+        204:
+          description: Status updated successfully.
+          content: {}
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Status already set to aborted.
+          content: {}
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: Status
+  /api/devices/v1/aideployments/device/deployments/{id}/log:
+    put:
+      summary: Upload the device AI deployment log
+      description: |
+        Set the log of a selected AI deployment. Messages are split by line in the payload.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: AI Deployment identifier.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: AI Deployment log
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeploymentLog'
+        required: true
+      responses:
+        204:
+          description: The AI deployment log uploaded successfully.
+          content: {}
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-codegen-request-body-name: Log
+  /api/devices/v1/aideployments/device/artifacts/{id}/download:
+    get:
+      summary: Get the download link of a selected artifact
+      description: |
+        Generates signed URL for downloading artifact file. URI can be used only
+        with GET HTTP method. Link supports such HTTP headers: 'Range',
+        'If-Modified-Since', 'If-Unmodified-Since' It is valid for specified
+        period of time.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Artifact identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactLink'
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Description of the error.
+        request_id:
+          type: string
+          description: Request ID (same as in X-MEN-RequestID header).
+      description: Error descriptor.
+      example:
+        application/json:
+          error: 'Error string'
+          request_id: f7881e82-0492-49fb-b459-795654e7188a
+    DeploymentInstructions:
+      required:
+      - artifact
+      - id
+      type: object
+      properties:
+        id:
+          type: string
+          description: AI Deployment ID (device unique)
+        artifact:
+          required:
+          - artifact_name
+          - device_types_compatible
+          - source
+          type: object
+          properties:
+            source:
+              type: object
+              properties:
+                uri:
+                  type: string
+                  description: URL to fetch the artifact from
+                  format: url
+                expire:
+                  type: string
+                  description: URL expiration time
+                  format: date-time
+            device_types_compatible:
+              type: array
+              description: Compatible device types
+              items:
+                type: string
+            artifact_name:
+              type: string
+      example:
+        application/json:
+          id: w81s4fae-7dec-11d0-a765-00a0c91e6bf6
+          artifact:
+            artifact_name: my-app-0.1
+            source:
+              uri: https://aws.my_update_bucket.com/image_123
+              expire: 2016-03-11T13:03:17.063493443Z
+            device_types_compatible:
+            - rspi
+            - rspi2
+            - rspi0
+    DeploymentLog:
+      required:
+      - messages
+      type: object
+      properties:
+        messages:
+          type: array
+          items:
+            required:
+            - level
+            - message
+            - timestamp
+            type: object
+            properties:
+              timestamp:
+                type: string
+                format: date-time
+              level:
+                type: string
+              message:
+                type: string
+      example:
+        application/json:
+          messages:
+          - timestamp: 2016-03-11T13:03:17.063493443Z
+            level: INFO
+            message: OK
+          - timestamp: 2016-03-11T13:03:18.023765782Z
+            level: DEBUG
+            message: successfully updated.
+    ArtifactLink:
+      required:
+      - expire
+      - uri
+      type: object
+      properties:
+        uri:
+          type: string
+        expire:
+          type: string
+          format: date-time
+      description: URL for artifact file download.
+      example:
+        application/json:
+          uri: http://ewm-preprod-mt.edgeway.io/artifact.tar.gz.edgeway
+          expire: 2016-10-29T10:45:34Z
+  responses:
+    InternalServerError:
+      description: Internal Server Error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InvalidRequestError:
+      description: Invalid Request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFoundError:
+      description: Not Found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
