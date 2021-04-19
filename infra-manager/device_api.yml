@@ -74,4 +74,6 @@ components:
       properties:
         domain_name:
           type: string
-      example: {"domain_name":"ewm-prep.edgeway.io"}
+        public_ip:
+          type: string
+      example: {"domain_name":"ewm-prep.edgeway.io", "public_ip":"12.22.02.172"}
