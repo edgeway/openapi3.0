@@ -129,6 +129,23 @@ components:
         error: "Error string"
         request_id: "f7881e82-0492-49fb-b459-795654e7188a"
 
+    AI_PACKAGE:
+      description: AI engine/model model
+      type: object
+      properties:
+        type:
+          description: Type of config engine or model.
+          type: string
+        name:
+          description: Name of the package.
+          type: string
+        version:
+          description: Package version.
+          type: string
+        status:
+          description: Status of deployment (Created, Pending, In-progress, Finished)
+          type: string
+
     Lconf:
       description: local configurations model
       type: object
@@ -142,6 +159,10 @@ components:
         id:
           description: db assigned id
           type: string
+        ai_package:
+          type: array
+          items:
+            $ref: '#/components/schemas/AI_PACKAGE'
         created_ts:
           type: string
           format: datetime
@@ -155,6 +176,7 @@ components:
        created_ts: "2019-04-16T06:44:16.386Z"
        device_id: "5ca5a5e53654df850001145049"
        id: "5cb579c066b19200019d546f"
+       ai_package: [{"type": "engine","name": "abc","version": "0.5.8","status": "installed"},{"type": "model","name": "abc1","version": "0.5.9","status": "installed"}]
        updated_ts: "2019-04-16T06:44:16.386Z"
 
     LocalConf:
@@ -172,6 +194,10 @@ components:
         config_details:
           description: JSON string with configurations details
           type: string
+        ai_package:
+          type: array
+          items:
+            $ref: '#/components/schemas/AI_PACKAGE'
         created_ts:
           type: string
           format: datetime
