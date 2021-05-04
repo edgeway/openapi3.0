@@ -615,10 +615,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     put:
-      summary: Update description of a selected artifact
+      summary: Update description of a selected artifact and
+               Upload release note file for artifact
       description: |
         Edit description. Artifact is not allowed to be edited if it was used
         in any deployment.
+        Upload release note for artifact.
+        Updating release note name, size and release-note is mendatory.
+        Updating only description description and release note is necessary.
+
       security:
       - bearerAuth: []
       parameters:
@@ -630,10 +635,26 @@ paths:
           type: string
       requestBody:
         content:
-          '*/*':
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/ArtifactUpdate'
-        required: false
+              required:
+              - release-note
+              - description
+              properties:
+                name:
+                  type: string
+                  description: Name of the release note file.
+                size:
+                  type: string
+                  description: Size of the release note file in bytes.
+                description:
+                  type: string
+                  description: Description for Artifact.
+                release-note:
+                  type: string
+                  description: Release note file data.
+                  format: binary
+        required: true
       responses:
         204:
           description: The artifact metadata updated successfully.
@@ -757,6 +778,81 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StorageLimit'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/releasenote/download/{id}:
+    get:
+      summary: Get the release note by release note ID.
+      description: |
+        Returns the release note for given ID.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Release note identifier identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Returns PDF
+          content:
+            '*/*':
+              schema: 
+                type: string
+                format: binary
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal Server Error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v1/deployments/releasenote/remove/{id}:
+    delete:
+      summary: Delete the release note by release note ID.
+      description: |
+        Delete the release note by release note ID.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Release note identifier identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        204:
+          description: Release note removed.
+        400:
+          description: Invalid Request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not Found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Internal Server Error.
           content:
