@@ -15,80 +15,6 @@ servers:
     description: Prod Server
 
 paths:
-  /api/edgeway/ewc/v1/infra_manager/infrastructure/status:
-    put:
-      description: Update Infrastructure Status.
-                    Tenant ID is being taken from the JWT.
-      summary: Update Infrastructure Status.
-      security:
-        - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Status'
-      responses:
-          200:
-            description: Update Infrastructure Status success.
-          400:
-            description: Bad request
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          401:
-            description: Authorization failed
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          404:
-            description: No infrastructure exist.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          500:
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-
-  /api/edgeway/ewc/v1/infra_manage/infrastructure:
-    description: Update infrastructure from EWC
-                  Tenant ID is being taken from the JWT.
-    put:
-      summary: Update Infrastructure.
-      security:
-        - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-                  $ref: '#/components/schemas/EWCInfrastructure'
-      responses:
-          200:
-            description: Update infrastructure success.
-          400:
-            description: bad request empty object is returned
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          401:
-            description: Authorization failed
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-          500:
-            description: Unexpected error
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-
   /api/edgeway/ewx/v2/infra_manager/infrastructures/auth:
     get:
       description: A JSON web token (JWT) required to login.
@@ -261,6 +187,80 @@ paths:
                   $ref: '#/components/schemas/v2InfrastructureRmqInfo'
           400:
             description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewc/v1/infra_manager/infrastructure/status:
+    put:
+      description: Update Infrastructure Status.
+                    Tenant ID is being taken from the JWT.
+      summary: Update Infrastructure Status.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Status'
+      responses:
+          200:
+            description: Update Infrastructure Status success.
+          400:
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: No infrastructure exist.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewc/v1/infra_manage/infrastructure:
+    description: Update infrastructure from EWC
+                  Tenant ID is being taken from the JWT.
+    put:
+      summary: Update Infrastructure.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+                  $ref: '#/components/schemas/EWCInfrastructure'
+      responses:
+          200:
+            description: Update infrastructure success.
+          400:
+            description: bad request empty object is returned
             content:
               application/json:
                 schema:
