@@ -10,7 +10,7 @@ info:
 servers:
   - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-  
+
   - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
@@ -89,6 +89,195 @@ paths:
                 schema:
                   $ref: '#/components/schemas/Error'
 
+  /api/edgeway/ewx/v2/infra_manager/infrastructures/auth:
+    get:
+      description: A JSON web token (JWT) required to login.
+      summary: A JSON web token (JWT) required to login.
+      parameters:
+        - in: query
+          name: apikey
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: domain_name
+          required: true
+          schema:
+            type: string
+      responses:
+          200:
+            description: a JSON web token (JWT) required to login.
+            content:
+              application/jwt:
+                schema:
+                  type: string
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewx/v2/infra_manager/infrastructure/pair:
+    put:
+      description: Pair EWC infrastructure to EWM
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2InfrastructurePair'
+      responses:
+          204:
+            description: EWC paired to EWM successfully.
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewx/v2/infra_manager/infrastructure/heartbeat:
+    put:
+      description: Notify EWX availibility to EWM at regular interval (heartbeat).
+      security:
+          - bearerAuth: []
+      responses:
+          204:
+            description: Heartbeat updated successfully.
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewx/v2/infra_manager/infrastructure/status:
+    put:
+      description: Update EWx infrastructure status.
+      security:
+          - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2Status'
+      responses:
+          204:
+            description: Status updated successfully.
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/edgeway/ewx/v2/infra_manager/infrastructure/statistics:
+    put:
+      description: Update infrastructure statistics.
+      security:
+          - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2Statistics'
+      responses:
+          204:
+            description: Statistics updated successfully.
+          400:
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /api/edgeway/ewx/v2/infra_manager/infrastructure/rmq:
+    get:
+      description: Get RMQ configuration.
+      security:
+        - bearerAuth: []
+      summary: Get RMQ configuration.
+      responses:
+          200:
+            description: RMQ response object
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/v2InfrastructureRmqInfo'
+          400:
+            description: Bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -146,6 +335,77 @@ components:
         updated_ts:
           type: string
 
+    v2Statistics:
+      type: object
+      properties:
+        bandwidth:
+          type: string
+        bandwidth_threshold:
+          type: string
+        cpu_load:
+          type: string
+        cpu_load_threshold:
+          type: string
+
+    v2InfrastructurePair:
+      description: Pair infrastructure
+      type: object
+      properties:
+        type:
+          type: string
+        version:
+          type: object
+          properties:
+            software:
+              type: string
+            protocol:
+              type: string
+        public_ip:
+          type: string
+        private_ip:
+          type: string
+        pairing_status:
+          type: number
+          format: int
+        username:
+          type: string
+        password:
+          type: string
+
+    v2InfrastructureRmqInfo:
+      description: Infra RMQ configuration.
+      type: object
+      properties:
+        vhost:
+          type: string
+        user:
+          type: string
+        pwd:
+          type: string
+        exchange:
+          type: string
+        route_key:
+          type: string
+        port:
+          type: string
+        secure_port:
+          type: string
+
+    v2Status:
+      type: object
+      properties:
+        uptime:
+          type: string
+        status:
+          description: Status could be OK, NOK, OFFLINE.
+          type: string
+        error:
+          type: object
+          properties:
+            state:
+              type: string
+            msg:
+              type: string
     error:
       type: object
       properties:
@@ -179,7 +439,7 @@ components:
           $ref: '#/components/schemas/error'
         webpage_port_range:
           $ref: '#/components/schemas/onvifRtspPortRange'
-        
+
     Status:
       description: infrastructure Status
       type: object
@@ -192,7 +452,7 @@ components:
           $ref: '#/components/schemas/EwcServer'
         bridgeMgr:
           $ref: '#/components/schemas/bridgeMgr'
-    
+
     IP:
       description: Public and private IP
       type: object
@@ -222,5 +482,3 @@ components:
           $ref: '#/components/schemas/IP'
         ports:
           $ref: '#/components/schemas/Ports'
-
-        
