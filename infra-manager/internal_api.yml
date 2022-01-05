@@ -15,6 +15,290 @@ servers:
     description: Prod Server
 
 paths:
+  /api/internal/v2/infra_manager/infrastructures:
+    post:
+      description: Create infrastructure request
+      summary: Create infrastructure request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2CreateInfra'
+      responses:
+          200:
+            description: creating infrastures success
+                        InfraID is added as part of Header named as 'location'
+            headers:
+              Location:
+                schema:
+                  type: string
+                description: infrastructure ID.
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+    get:
+      description: Get list of infrastructures
+      summary: Get list of infrastructure.
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: per_page
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: filter
+          style: deepObject
+          allowReserved: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: string
+              per_page:
+                type: string
+              sort:
+                type: array
+                items:
+                  type: string
+              has_group:
+                type: boolean
+              default:
+                type: array
+                items:
+                  type: string
+              fields:
+                type: array
+                items:
+                  type: string
+              group:
+                type: array
+                items:
+                  type: string
+      responses:
+          200:
+            description: Getting list of infrastructures.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/v2ListInfrastructure'
+            headers:
+              X-Total-Count:
+                schema:
+                  type: integer
+                description: Request limit per hour.
+              Link:
+                schema:
+                  type: string
+                description: Standard header, we support 'first', 'next', and 'prev'.
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+      
+  /api/internal/v2/infra_manager/infrastructures/{id}:
+    get:
+      description: Get infrastructure request
+      summary: Get infrastructure request
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+          201:
+            description: Infrastructurs by ID
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/v2Infrastructure'
+          400:
+            description: bad request empty object is returned
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/internal/v2/infra_manager/infrastructures/{id}/resources:
+    patch:
+      description: Update infrastructure resources by instance ID.
+      summary: Update infrastructure resources by instance ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2ListInfraResourceUpdate'
+      responses:
+          202:
+            description: Update infrastructure success.
+          400:
+            description: Bad request.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/internal/v2/infra_manager/auth/verify:
+    post:
+      description: Verify auth token.
+      summary: Verify auth token.
+      security:
+        - bearerAuth: []
+      responses:
+          202:
+            description: Verify token success.
+          400:
+            description: Bad request.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
+  /api/internal/v2/infra_manager/tenants/{tid}/infrastructures:
+    post:
+      description: Create infrastructure by tenant id.
+      summary: Create infrastructure by tenant id.
+      parameters:
+        - in: path
+          name: tid
+          description: tenant id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: default
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2CreateInfra'
+      responses:
+          200:
+            description: Create infrastructure success.
+          400:
+            description: Bad request.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+      description: Delete infrastructure by tenant id.
+      summary: Delete infrastructure by tenant id.
+      parameters:
+        - in: path
+          name: tid
+          description: tenant id
+          required: true
+          schema:
+            type: string
+      responses:
+          204:
+            description: Delete infrastructure success.
+          400:
+            description: Bad request.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+
   /api/internal/v1/infra/instance/{id}:
     get:
       description: Get infrastructure by instace ID
@@ -266,14 +550,20 @@ components:
       example:
         error: 'Error string'
         request_id: f7881e82-0492-49fb-b459-795654e7188a
+
     onvifRtspPortRange:
       description: onvif port ranges object
       type: object
       properties:
         start:
-          type: number
+          type: integer
+          format: uint64
+          description: pointer to uint64
         end:
-          type: number
+          type: integer
+          format: uint64
+          description: pointer to uint64
+
     getInfraStructuresObj:
       description: get infrastructure object
       type: object
@@ -332,7 +622,7 @@ components:
           $ref: '#/components/schemas/error'
         webpage_port_range:
           $ref: '#/components/schemas/onvifRtspPortRange'
-        
+
     Status:
       description: infrastructure Status
       type: object
@@ -365,7 +655,7 @@ components:
           $ref: '#/components/schemas/onvifRtspPortRange'
         webpage_port_range:
           $ref: '#/components/schemas/onvifRtspPortRange'
-    
+
     UpdatePorts:
       description: Update infrastructure ports.
       type: object
@@ -380,3 +670,226 @@ components:
           type: integer
         altd_webpage_ports:
           type: integer
+
+    VCPortRange:
+      description: VC port ranges object
+      type: object
+      properties:
+        start:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+        end:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+
+    RAPortRange:
+      description: RA port ranges object
+      type: object
+      properties:
+        start:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+        end:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+
+    v2CreateInfra:
+      description: create infrastructure
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name must be 5 to 12 character and should only use a-z or 0-9 
+        type:
+          type: string
+          description: For example ewc, ewi, or ewx
+        hosted_by:
+          type: string
+          description: Hosted by Customer or Hosted by SmarDTV
+        server_port:
+          type: string
+          description: RMQ server port
+        VCPortRange:
+          $ref: '#/components/schemas/VCPortRange'
+        RAPortRange:
+          $ref: '#/components/schemas/RAPortRange'
+
+    v2ListInfrastructure:
+      description: Array of infrastructure
+      type: array
+      items:
+        $ref: '#/components/schemas/v2Infrastructure'
+
+    v2Infrastructure:
+      description: Infrastructure
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: object
+          properties:
+            software:
+              type: string
+            protocol:
+              type: string
+        instance_id:
+          type: string
+        tenant_id:
+          type: string
+        type:
+          type: string
+        public_ip:
+          type: string
+        private_ip:
+          type: string
+        domain_name:
+          type: string
+        onvif_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        free_onvif_ports:
+          type: integer
+          format: uint64
+        rtsp_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        free_rtsp_ports:
+          type: integer
+          format: uint64
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        free_webpage_ports:
+          type: integer
+          format: uint64
+        server_status:
+          type: object
+          properties:
+            uptime:
+              type: string
+            status:
+              type: string
+            error:
+              type: object
+              properties:
+                state:
+                  type: string
+                  description: "OK, OFFLINE, NOK"
+                msg:
+                  type: string
+        ewc_conn_status:
+          type: integer
+          items:
+            type: integer
+        altd_onvif_ports:
+          type: array
+          items:
+            type: integer
+        altd_rtsp_ports:
+          type: array
+          items:
+            type: integer
+        altd_webpage_ports:
+          type: array
+          items:
+            type: integer
+        default:
+          type: boolean
+        pairing_status:
+          type: integer
+          format: int
+        statistics:
+          type: object
+          properties:
+            bandwidth:
+              type: string
+            bandwidth_threshold:
+              type: string
+            cpu_load:
+              type: string
+            cpu_load_threshold:
+              type: string
+        vc_port_range:
+          $ref: '#/components/schemas/VCPortRange'
+        vc_allocated_ports:
+          type: array
+          items:
+            type: integer
+        ra_port_range:
+          $ref: '#/components/schemas/RAPortRange'
+        ra_allocated_ports:
+          type: array
+          items:
+            type: integer
+        max_vcs:
+          type: string
+        vcs:
+          type: array
+          items:
+            type: string
+        max_nodes:
+          type: integer
+          format: int
+        nodes:
+          type: array
+          items:
+            type: string
+        Status:
+          type: object
+          properties:
+            uptime:
+              type: string
+            status:
+              type: string
+            error:
+              type: object
+              properties:
+                state:
+                  type: string
+                  description: "OK, OFFLINE, NOK"
+                msg:
+                  type: string
+        description:
+          type: string
+        region:
+          type: string
+        hosted_by:
+          type: string
+        server_port:
+          type: string
+        server_path:
+          type: string
+        api_key:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+
+    v2ListInfraResourceUpdate:
+      type: array
+      items:
+        $ref: '#/components/schemas/v2InfraResourceUpdate'
+    v2InfraResourceUpdate:
+      type: object
+      properties:
+        type:
+          type: integer
+          format: int
+          description: Port types to be updated
+                        Ex- INFRA_PORT_VC = 1, INFRA_PORT_RA = 2, INFRA_NODE = 3, INFRA_VC = 4, 
+        action:
+          type: string
+          description: action to be performed
+                       Ex- INFRA_ACTION_ADD = "add", INFRA_ACTION_REMOVE = "remove"
+        ports:
+          type: array
+          items:
+            type: integer
+            format: uint64
+        uuids:
+          type: array
+          items:
+            type: string
