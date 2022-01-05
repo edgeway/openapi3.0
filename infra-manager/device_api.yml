@@ -48,6 +48,92 @@ paths:
                 schema:
                   $ref: '#/components/schemas/Error'
 
+  /api/management/v2/infra_manager/infrastructures:
+    get:
+      description: Get list of infrastructures
+      summary: Get list of infrastructure.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: per_page
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: sort
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: filter
+          style: deepObject
+          allowReserved: true
+          schema:
+            type: object
+            properties:
+              page:
+                type: string
+              per_page:
+                type: string
+              sort:
+                type: array
+                items:
+                  type: string
+              has_group:
+                type: boolean
+              default:
+                type: array
+                items:
+                  type: string
+              fields:
+                type: array
+                items:
+                  type: string
+              group:
+                type: array
+                items:
+                  type: string
+      responses:
+          200:
+            description: Getting list of infrastructures.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/v2ListInfrastructure'
+            headers:
+              X-Total-Count:
+                schema:
+                  type: integer
+                description: Request limit per hour.
+              Link:
+                schema:
+                  type: string
+                description: Standard header, we support 'first', 'next', and 'prev'.
+          400:
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          401:
+            description: Authorization failed
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          500:
+            description: Unexpected error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
 components:
   securitySchemes:
     bearerAuth:
@@ -77,3 +163,191 @@ components:
         public_ip:
           type: string
       example: {"domain_name":"ewm-prep.edgeway.io", "public_ip":"12.22.02.172"}
+    v2ListInfrastructure:
+      description: Array of infrastructure
+      type: array
+      items:
+        $ref: '#/components/schemas/v2Infrastructure'
+
+    v2Infrastructure:
+      description: Infrastructure
+      type: object
+      properties:
+        name:
+          type: string
+        version:
+          type: object
+          properties:
+            software:
+              type: string
+            protocol:
+              type: string
+        instance_id:
+          type: string
+        tenant_id:
+          type: string
+        type:
+          type: string
+        public_ip:
+          type: string
+        private_ip:
+          type: string
+        domain_name:
+          type: string
+        onvif_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        free_onvif_ports:
+          type: integer
+          format: uint64
+        rtsp_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        free_rtsp_ports:
+          type: integer
+          format: uint64
+        webpage_port_range:
+          $ref: '#/components/schemas/onvifRtspPortRange'
+        free_webpage_ports:
+          type: integer
+          format: uint64
+        server_status:
+          type: object
+          properties:
+            uptime:
+              type: string
+            status:
+              type: string
+            error:
+              type: object
+              properties:
+                state:
+                  type: string
+                  description: "OK, OFFLINE, NOK"
+                msg:
+                  type: string
+        ewc_conn_status:
+          type: integer
+          items:
+            type: integer
+        altd_onvif_ports:
+          type: array
+          items:
+            type: integer
+        altd_rtsp_ports:
+          type: array
+          items:
+            type: integer
+        altd_webpage_ports:
+          type: array
+          items:
+            type: integer
+        default:
+          type: boolean
+        pairing_status:
+          type: integer
+          format: int
+        statistics:
+          type: object
+          properties:
+            bandwidth:
+              type: string
+            bandwidth_threshold:
+              type: string
+            cpu_load:
+              type: string
+            cpu_load_threshold:
+              type: string
+        vc_port_range:
+          $ref: '#/components/schemas/VCPortRange'
+        vc_allocated_ports:
+          type: array
+          items:
+            type: integer
+        ra_port_range:
+          $ref: '#/components/schemas/RAPortRange'
+        ra_allocated_ports:
+          type: array
+          items:
+            type: integer
+        max_vcs:
+          type: string
+        vcs:
+          type: array
+          items:
+            type: string
+        max_nodes:
+          type: integer
+          format: int
+        nodes:
+          type: array
+          items:
+            type: string
+        Status:
+          type: object
+          properties:
+            uptime:
+              type: string
+            status:
+              type: string
+            error:
+              type: object
+              properties:
+                state:
+                  type: string
+                  description: "OK, OFFLINE, NOK"
+                msg:
+                  type: string
+        description:
+          type: string
+        region:
+          type: string
+        hosted_by:
+          type: string
+        server_port:
+          type: string
+        server_path:
+          type: string
+        api_key:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+
+    VCPortRange:
+      description: VC port ranges object
+      type: object
+      properties:
+        start:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+        end:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+
+    RAPortRange:
+      description: RA port ranges object
+      type: object
+      properties:
+        start:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+        end:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+    
+    onvifRtspPortRange:
+      description: onvif port ranges object
+      type: object
+      properties:
+        start:
+          type: integer
+          format: uint64
+          description: pointer to uint64
+        end:
+          type: integer
+          format: uint64
+          description: pointer to uint64
