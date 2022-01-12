@@ -713,9 +713,9 @@ components:
         server_port:
           type: string
           description: RMQ server port
-        VCPortRange:
+        vc_port_range:
           $ref: '#/components/schemas/VCPortRange'
-        RAPortRange:
+        ra_port_range:
           $ref: '#/components/schemas/RAPortRange'
 
     v2ListInfrastructure:
