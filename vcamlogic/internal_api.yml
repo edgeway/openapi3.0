@@ -357,14 +357,59 @@ components:
           items:
             $ref: '#/components/schemas/info'
 
-    VCamsUpdate:
-      description: array vcam device update
+    Client:
+      description: client information.
       type: object
+      properties:
+        ip_addr:
+          type: string
+        mode:
+          type: string
+        port:
+          type: string
+        connectionTime:
+          type: string
+
+    VCamsUpdate:
+      description: Vcam status, multicast port and IP, and heartbeat update.
       properties:
         vcams:
           type: array
           items:
-            $ref: '#/components/schemas/vcams'
+            properties:
+              device_id:
+                type: string
+              info:
+                type: array
+                items:
+                  properties:
+                    slotIndex:
+                      type: string
+                    mac:
+                      type: string
+                    multicast_ip:
+                      type: string
+                    multicast_port:
+                      type: string
+                    uptime:
+                      type: string
+                    restartCount:
+                      type: string
+                    status:
+                      type: string
+                    error:
+                      type: object
+                      properties:
+                        state:
+                          type: string
+                        msg:
+                          type: string
+                    bitrate:
+                      type: string
+                    clients:
+                      type: array
+                      items:
+                      $ref: '#/components/schemas/Client'
 
     getDevice:
       description: device info
