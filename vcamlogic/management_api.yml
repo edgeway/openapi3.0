@@ -371,6 +371,55 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/management/v2/vcamlogic/vcams:
+    description: Get all VCAM information.
+    get:
+      summary: Get VCAM's info.
+      description: Get VCAM's info.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success to get the devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VCams'
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
 
@@ -493,6 +542,114 @@ components:
         msg:
           type: string
 
+    Info:
+      description: Vcam information.
+      type: object
+      properties:
+        uptime:
+          type: integer
+        restartCount:
+          type: integer
+        type:
+          type: string
+        command:
+          type: string
+        status:
+          type: string
+        error:
+          type: object
+          properties:
+            state:
+              type: string
+            msg:
+              type: string
+        clients:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+        bitrate:
+          type: string
+
+    RtspChannel:
+      description: Rtsp channels.
+      type: object
+      properties:
+        profileName:
+          type: string
+        rtspUrl:
+          type: string
+        codec:
+          type: string
+        resolution:
+          type: integer
+        fps:
+          type: integer
+
+    VCams:
+      description: Vcam array.
+      type: array
+      items:
+        $ref: '#/components/schemas/VCam'
+
+    VCam:
+      description: Vcam information for GUI.
+      type: object
+      properties:
+        slotIndex:
+          type: integer
+        mac:
+          type: string
+        cameraBrand:
+          type: string
+        label:
+          type: string
+        cameraModel:
+          type: string
+        uuid:
+          type: string
+        userName:
+          type: string
+        password:
+          type: string
+        onvifPort:
+          type: integer
+        onvifUrl:
+          type: string
+        rtspPort:
+          type: integer
+        RtspUrl:
+          type: string
+        serverIP:
+          type: string
+        privateIP:
+          type: string
+        type:
+          type: string
+        cameraRtspChannels:
+          type: array
+          items:
+             $ref: '#/components/schemas/RtspChannel'
+        cameraNvrRecRtspPreferred:
+          type: string
+        cameraAnalyzeRtspPreferred:
+          type: string
+        info:
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+        ewc_instance_fqdn:
+          type: string
+        ewc_instance_name:
+          type: string
+        ewc_instance_id:
+          type: string
+        multicast_ip:
+          type: string
+        multicast_port:
+          type: string
+        heartbeat:
+          type: string
+
     info:
       description: vcam info
       type: object
@@ -525,14 +682,59 @@ components:
           items:
             $ref: '#/components/schemas/info'
 
-    VCamsUpdate:
-      description: array vcam device update
+    Client:
+      description: client information.
       type: object
+      properties:
+        ip_addr:
+          type: string
+        mode:
+          type: string
+        port:
+          type: string
+        connectionTime:
+          type: string
+
+    VCamsUpdate:
+      description: Vcam status, multicast port and IP, and heartbeat update.
       properties:
         vcams:
           type: array
           items:
-            $ref: '#/components/schemas/vcams'
+            properties:
+              device_id:
+                type: string
+              info:
+                type: array
+                items:
+                  properties:
+                    slotIndex:
+                      type: string
+                    mac:
+                      type: string
+                    multicast_ip:
+                      type: string
+                    multicast_port:
+                      type: string
+                    uptime:
+                      type: string
+                    restartCount:
+                      type: string
+                    status:
+                      type: string
+                    error:
+                      type: object
+                      properties:
+                        state:
+                          type: string
+                        msg:
+                          type: string
+                    bitrate:
+                      type: string
+                    clients:
+                      type: array
+                      items:
+                      $ref: '#/components/schemas/Client'
 
     VcamCommands:
       description: vcam commands
