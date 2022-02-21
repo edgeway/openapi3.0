@@ -314,27 +314,6 @@ components:
         end:
           type: number
 
-    GetInfraStructuresObj:
-      description: get infrastructure object
-      type: object
-      properties:
-        name:
-          type: string
-        instance_id:
-          type: string
-        public_ip:
-          type: string
-        onvif_port_range:
-          $ref: '#/components/schemas/onvifRtspPortRange'
-        rtsp_port_range:
-          $ref: '#/components/schemas/onvifRtspPortRange'
-        webpage_port_range:
-          $ref: '#/components/schemas/onvifRtspPortRange'
-        created_ts:
-          type: string
-        updated_ts:
-          type: string
-
     v2Statistics:
       type: object
       properties:
@@ -370,6 +349,10 @@ components:
         username:
           type: string
         password:
+          type: string
+        multicast_ip_start:
+          type: string
+        multicast_port:
           type: string
 
     v2InfrastructureRmqInfo:
