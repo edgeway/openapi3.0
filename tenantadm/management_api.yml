@@ -1152,6 +1152,91 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/management/v2/tenantadm/tenants/{id}/postprocess:
+    description: Get tenant Post process status.
+    get:
+      summary: Get tenant Post process status.
+      description: Get tenant Post process status.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Tenant ID.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Succes to get Post process status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APostProcess'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access to API.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update Post Process enable or diable.
+      description: Update Post Process enable or diable.
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Tenant ID.
+          schema:
+            type: string
+      requestBody:
+        description: Update Post Process status.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APostProcess'
+      responses:
+        204:
+          description: succes to Update Post Process status.
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1415,6 +1500,20 @@ components:
           type: integer
         organization:
           type: string
+
+    PostProcess:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: boolean
+      example: {"type":"spts","status":false}
+    APostProcess:
+      type: array
+      items:
+        $ref: '#/components/schemas/PostProcess'
+      example: [{"type":"spts","status":false}]
 
     TrialTenant:
       description: Tenant struct
