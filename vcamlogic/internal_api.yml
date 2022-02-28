@@ -204,6 +204,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/internal/v2/vcamlogic/postprocess:
+    description: Get tenant Post process status.
+    put:
+      summary: Update Post Process enable or diable.
+      description: Update Post Process enable or diable.
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Update Post Process status.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APostProcess'
+      responses:
+        204:
+          description: succes to Update Post Process status.
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Authorization failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
 
@@ -227,6 +267,20 @@ components:
       example:
         error: 'failed to decode device group data: JSON payload is empty'
         request_id: f7881e82-0492-49fb-b459-795654e7188a
+
+    PostProcess:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: boolean
+      example: {"type":"spts","status":false}
+    APostProcess:
+      type: array
+      items:
+        $ref: '#/components/schemas/PostProcess'
+      example: [{"type":"spts","status":false}]
 
     Camera:
       description: camera struct
