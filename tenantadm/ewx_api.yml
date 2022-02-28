@@ -11,7 +11,7 @@ info:
 servers:
   - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-  
+
   - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
@@ -62,6 +62,39 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/edgeway/ewc/v2/tenantadm/tenants/postprocess:
+    description: Get tenant Post process status.
+    get:
+      summary: Get tenant Post process status.
+      description: Get tenant Post process status.
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Succes to get Post process status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APostProcess'
+        400:
+          description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access to API.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -82,3 +115,16 @@ components:
       example:
         error: 'failed to decode device group data: JSON payload is empty'
         request_id: f7881e82-0492-49fb-b459-795654e7188a
+    PostProcess:
+      type: object
+      properties:
+        type:
+          type: string
+        status:
+          type: boolean
+      example: {"type":"spts","status":false}
+    APostProcess:
+      type: array
+      items:
+        $ref: '#/components/schemas/PostProcess'
+      example: [{"type":"spts","status":false}]
