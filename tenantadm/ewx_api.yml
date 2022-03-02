@@ -62,7 +62,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/edgeway/ewc/v2/tenantadm/tenants/postprocess:
+  /api/edgeway/ewc/v2/tenantadm/postprocess/features:
     description: Get tenant Post process status.
     get:
       summary: Get tenant Post process status.
