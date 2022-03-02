@@ -204,7 +204,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/internal/v2/vcamlogic/postprocess:
+  /api/internal/v2/vcamlogic/postprocess/features:
     description: Get tenant Post process status.
     put:
       summary: Update Post Process enable or diable.
