@@ -1152,7 +1152,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/management/v2/tenantadm/tenants/{id}/postprocess:
+  /api/management/v2/tenantadm/tenants/{id}/postprocess/features:
     description: Get tenant Post process status.
     get:
       summary: Get tenant Post process status.
@@ -1210,7 +1210,7 @@ paths:
             schema:
               $ref: '#/components/schemas/APostProcess'
       responses:
-        204:
+        202:
           description: succes to Update Post Process status.
         400:
           description: Bad request
