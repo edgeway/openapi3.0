@@ -421,6 +421,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/management/v2/vcamlogic/pp/{pp}/count:
+    get:
+      summary: Get Physical camera count for features enabled/disabled.
+      description: Get Physical camera count for features enabled/disabled.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: pp
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: configured
+          in: query
+          required: true
+          schema:
+            type: boolean
+          description: false will get pcam count does not have pp feature enabled
+                      true will get pcam count which have pp feature enabled
+      responses:
+        200:
+          description: Success to get the devices.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Count'
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
 
   securitySchemes:
@@ -443,6 +488,13 @@ components:
       example:
         error: 'failed to decode device group data: JSON payload is empty'
         request_id: f7881e82-0492-49fb-b459-795654e7188a
+
+    Count:
+      description: count
+      type: object
+      properties:
+        count:
+          type: string
 
     Camera:
       description: camera struct
