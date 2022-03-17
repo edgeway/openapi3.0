@@ -127,4 +127,4 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/PostProcess'
-      example: [{"type":"spts","status":false}]
+      example: [{"type":"features","status":false}, {"type":"spts","status":false}]
