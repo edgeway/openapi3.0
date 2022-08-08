@@ -17,6 +17,35 @@ servers:
     description: Prod Server
 
 paths:
+  /api/management/v1/useradm/oauth2/auth0/logout:
+    description: Logout from auth0
+    get:
+      summary: Logout API.
+      description: |
+        Logout user from auth0.
+      security:
+      - bearerAuth: []
+      responses:
+        307:
+          description: Redirection to auth0 logout api.
+          content:
+            '*/*':
+              schema:
+                type: string
+                example: https://YOUR_DOMAIN/v2/logout?client_id=YOUR_CLIENT_ID&returnTo=LOGOUT_URL
+        401:
+          description: |
+            The user cannot be granted authentication.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /api/management/v1/useradm/auth/login:
     post:
       summary: Log in to Edgeway
@@ -60,7 +89,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         429:
-          description: Max continuous flase attempt tried
+          description: Max continuous flase attempt tried (3 allowed)
           content:
             application/json:
               schema:
@@ -167,7 +196,7 @@ paths:
         200:
           description: Successful response - a user information is returned.
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/User'
         401:
@@ -278,71 +307,7 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v1/useradm/settings:
-    get:
-      summary: Get user settings
-      description: |
-        Returns user settings.
-      security:
-      - bearerAuth: []
-      responses:
-        200:
-          description: Successful response - a user information is returned.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Settings'
-        401:
-          description: |
-            The user cannot be granted authentication.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Internal server error.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
-    post:
-      summary: Set user settings
-      description: |
-        Create user settings or replace existing settings with provided object.
-      security:
-      - bearerAuth: []
-      requestBody:
-        description: New user settings.
-        content:
-          '*/*':
-            schema:
-              $ref: '#/components/schemas/Settings'
-        required: true
-      responses:
-        201:
-          description: User settings set.
-          content: {}
-        400:
-          description: |
-            The request body is malformed.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: |
-            The user cannot be granted authentication.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Internal server error.
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/Error'
-      x-codegen-request-body-name: settings
+
   /api/management/v1/useradm/auth/forgotpwd:
     description: Send the URL link to reset the password on provided Email
     post:
@@ -358,6 +323,7 @@ paths:
       responses:
         200:
           description: Success to send reset link to provided email.
+                        for auth0 and local user as well.
         400:
           description: Missing/malformed request params.
           content:
@@ -487,6 +453,12 @@ paths:
     get:
       description: Auth0 verification
       summary: Auth0 verification
+      parameters:
+      - in: cookie
+        name: auth-session   
+        required: true
+        schema:
+          type: string
       responses:
         303:
           description: redirected to authenticate code
@@ -551,7 +523,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-    basicAuth:     # <-- arbitrary name for the security scheme
+    basicAuth:
       type: http
       scheme: basic
     auth0:
@@ -576,7 +548,7 @@ components:
             '+'.
         password:
           type: string
-          description: Password.
+          description: Password must be greater than 8 chaacters.
         role:
           type: string
           description: Role must be admin or viewer.
@@ -591,7 +563,7 @@ components:
       properties:
         email:
           type: string
-          description: A unique email address.
+          description: Can not be updated but required to pass.
         password:
           type: string
           description: Password.
@@ -604,10 +576,12 @@ components:
           email: new_email@acme.com
           password: Abcsdf@128#$
           role: admin
+
     User:
       required:
       - email
-      - id
+      - role
+      - auth0
       type: object
       properties:
         email:
@@ -616,6 +590,15 @@ components:
         id:
           type: string
           description: User Id.
+        role:
+          type: string
+          description: Role could be systemadm, admin, viewer.
+        auth0:
+          type: boolean
+          description: if auth0 user then true else false.
+        falselogincnt:
+          type: integer
+          description: Number of false attempt to login.
         created_ts:
           type: string
           description: |
@@ -627,12 +610,6 @@ components:
             Server-side timestamp of the last user information update.
           format: date-time
       description: User descriptor.
-      example:
-        application/json:
-          email: user@acme.com
-          id: 806603def19d417d004a4b67e
-          created_ts: 2016-10-03T16:58:51.639Z
-          updated_ts: 2016-10-04T11:33:66.611Z
     Error:
       type: object
       properties:
@@ -647,9 +624,7 @@ components:
         application/json:
           error: Error string
           request_id: f7881e82-0492-49fb-b459-795654e7188a
-    Settings:
-      type: object
-      description: User settings.
+
     passwordreset:
       description: reset payload
       type: object
