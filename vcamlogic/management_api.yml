@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'Vcamlogic Mnagement API'
+  title: 'Vcamlogic Mnagement V1 and V2 API for VCAM, PCAM and PP'
   description: 'API for managing  virtual camera logic configuration.
                 To get and update vcam devices. Get device by ID.
                 Update slot configuration for particular device.'
@@ -12,7 +12,7 @@ info:
 servers:
   - url: https://ewm-preprod.edgeway.io
     description: Dev Server
-  
+
   - url: https://ewm-preprod-mt.edgeway.io
     description: Prod Server
 
@@ -67,43 +67,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-    put:
-      description: Update devices
-      summary: Update devices
-      security:
-      - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VCamsUpdate'
-      responses:
-        201:
-          description: Success to update devices.
-        400:
-            description: Missing/malformed request params.
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/Error'
-        401:
-          description: Unauthorised access.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
 
   /api/management/v1/vcamlogic/devices/{did}/vcams/commands:
     description: Update vcam device commands
@@ -124,7 +87,7 @@ paths:
             schema:
               $ref: '#/components/schemas/VcamCommands'
       responses:
-        201:
+        204:
           description: Success to update device commands.
         400:
           description: Missing or malformed request parameters.
@@ -134,6 +97,12 @@ paths:
                 $ref: '#/components/schemas/Error'
         401:
           description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
           content:
             application/json:
               schema:
@@ -165,7 +134,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/getDevice'
+                $ref: '#/components/schemas/Device'
         400:
           description: Missing or malformed request parameters.
           content:
@@ -191,188 +160,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /api/management/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}:
-    description: Update and get device camera slots.
-    put:
-      summary: Update and get device camera slots.
-      description: Update and get device camera slots.
-      security:
-      - bearerAuth: []
-      parameters:
-        - in: path
-          name: did
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: mac
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: idx
-          required: true
-          schema:
-            type: string
-      responses:
-        201:
-          description: Success to update the camera slots.
-        401:
-          description: Unauthorised access.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Unexpected error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-    get:
-      summary: Get camera for device by deviceID, mac and index.
-      description: Get camera for device by deviceID, mac and index.
-      security:
-      - bearerAuth: []
-      parameters:
-        - in: path
-          name: did
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: mac
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: idx
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: Success to get the device camera slots.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Camera'
-        401:
-          description: Unauthorised access.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Unexpected error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/management/v1/vcamlogic/tenants/{tid}/devices:
-    description: Update vcam status for all the devices in the tenant.
-    put:
-      security:
-        - bearerAuth: []
-      description: Update vcam status for all the devices in the tenant.
-      parameters:
-        - in: path
-          name: tid
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/vcams'
-      responses:
-        201:
-          description: Update successful.
-        400:
-          description: Missing/malformed request params.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: Unauthorised access.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
-  /api/management/v1/vcamlogic/devices/{did}/camera/{mac}/slots/{idx}/type:
-    description: Update type of virtual camera.
-    put:
-      description: Update type of virtual camera.
-      summary: Update type of virtual camera.
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: did
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: mac
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: idx
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/vcamType'
-      responses:
-        201:
-          description: Update successful.
-        400:
-          description: Missing/malformed request params.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        401:
-          description: Unauthorised access.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-
   /api/management/v2/vcamlogic/vcams:
-    description: Get all VCAM information.
+    description: Get/Post VCAM.
     get:
       summary: Get VCAM's info.
       description: Get VCAM's info.
@@ -396,6 +185,134 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VCams'
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      description: Create VCAM clone by UUID
+      summary: Get VCAM's info.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: primary
+          description: Primary VCAM UUID
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: copies
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        201:
+          description: Success clone the VCAM.
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v2/vcamlogic/vcams/{uuid}:
+    description: Update and Delete VCAM by UUID.
+    put:
+      summary: Update Vcam.
+      description: Update Vcam.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VCUpdate'
+      responses:
+        204:
+          description: Success to update vcam.
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      description: Delete secondary vcam by UUID.
+      summary: Delete secondary vcam by UUID.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Success delete secondary vcam.
         400:
             description: Missing/malformed request params.
             content:
@@ -466,6 +383,235 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
+  /api/management/v2/vcamlogic/vcams/{uuid}/pp/{type}:
+    description: Restart VCAM by UUID and Type.
+    put:
+      summary: Restart Vcam.
+      description: Restart Vcam.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: restart
+          in: query
+          required: true
+          description: values must be true or false
+          schema:
+            type: string
+      responses:
+        202:
+          description: Success to restart vcam.
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v2/vcamlogic/pp/{pp}:
+    description: Get and update post process by type.
+    get:
+      summary: Get post process for vcams by type.
+      description: Get post process for vcams by type.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: pp
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Succes to get the SPTS information for VCAMs.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostProcessFeature'
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      description: update post process of vcams.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: pp
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostProcessFeature'
+      responses:
+        202:
+          description: Succes to update the SPTS information for VCAMs.
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/pcams:
+    description: Get PCAMs.
+    get:
+      summary: Get PCAM's.
+      description: Get PCAM's.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: per_page
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Success to get the physical cameras.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PCams'
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/management/v1/vcamlogic/pcams/{id}:
+    delete:
+      description: Delete physical camera.
+      summary: Delete physical camera.
+      security:
+      - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Success delete physical camera.
+        400:
+            description: Missing/malformed request params.
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised access.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
 components:
 
   securitySchemes:
@@ -496,155 +642,8 @@ components:
         count:
           type: string
 
-    Camera:
-      description: camera struct
-      type: object
-      properties:
-        slot_index:
-          type: integer
-        uuid:
-          type: string
-        mac:
-          type: string
-        user_name:
-          type: string
-        password:
-          type: string
-        public_ip:
-          type: string
-        cameraTestedStatus:
-          type: integer
-        onvif_port:
-          type: integer
-        onvif_url:
-          type: string
-        rtsp_port:
-          type: integer
-        rtsp_url:
-          type: string
-        rtsp_channels:
-          type: string
-        cameraNvrRecRtspPreferred:
-          type: string
-        cameraAnalyzeRtspPreferred:
-          type: string
-        info:
-          type: string
-      example: {"slot_index":7,"uuid":"e37448c4-13dc-4361-a89e-f5b0c08622b3","mac":"00:07:5f:b3:e7:77","camera_brand":"Bosch","camera_model":"FLEXIDOME IP micro 3000i","user_name":"admin","password":"Aveiro-35","type":"","public_ip":"","private_ip":"","cameraTestedStatus":2,"onvif_port":7507,"onvif_url":"http://smart-ewc.edgeway.io:7507/onvif/device_service","rtsp_port":7707,"rtsp_url":"rtsp://smart-ewc.edgeway.io:7707/proxyStreamer_profile_1","rtsp_channels":[{"profileName":"H26x_L1S1","rtspUrl":"rtsp://192.168.1.199/rtsp_tunnel?p=0\u0026h26x=4\u0026vcd=2","codec":"H264","resolution":3072,"fps":20},{"profileName":"H26x_L1S2","rtspUrl":"rtsp://192.168.1.199/rtsp_tunnel?p=1\u0026inst=2\u0026h26x=4","codec":"H264","resolution":3072,"fps":20},{"profileName":"JPEG_L1S3","rtspUrl":"rtsp://192.168.1.199/rtsp_tunnel?h26x=0","codec":"JPEG","resolution":3072,"fps":20}],"cameraNvrRecRtspPreferred":"H26x_L1S1","cameraAnalyzeRtspPreferred":"H26x_L1S1","info":{"uptime":0,"restartCount":0,"type":"","command":"","status":"","error":{"state":"","msg":""}}}
-    ActiveCamera:
-      description: active cameras
-      properties:
-        slot_index:
-          type: string
-        mac:
-          type: string
-        partof:
-          type: string
-
-    Device:
-      description: device struct
-      type: object
-      properties:
-        id:
-          type: string
-        device_id:
-          type: string
-        device_uuid:
-          type: string
-        device_mac:
-          type: string
-        slot_configuration:
-          type: array
-          items:
-            $ref: '#/components/schemas/Camera'
-        slots:
-          type: object
-          properties:
-            string:
-              type: array
-              items:
-                properties:
-                  string:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Camera'
-        slot_index:
-          type: string
-        active_cams:
-          type: array
-          items:
-            $ref: '#/components/schemas/ActiveCamera'
-        created_ts:
-          type: string
-        updated_ts:
-          type: string
-    ArrayDevice:
-      description: array of devices
-      type: array
-      items:
-        $ref: '#/components/schemas/Device'
-        example: [{"deviceId":"603e36e24d50c80001d46c35","deviceMAC":"","UUID":"54d1ac67-96fd-4b13-b672-2c1eaa1350fc","vcams":[{"slotIndex":1,"mac":"b4:a3:82:47:89:7f","cameraBrand":"HIKVISION","cameraModel":"DS-2CD2542FWD-IS","uuid":"8502f8e6-02ed-4702-87d9-f6f535c92e7c","userName":"adminHK","password":"Aveiro35HK","onvifPort":7501,"onvifUrl":"http://smart-ewc.edgeway.io:7501/onvif/device_service","rtspPort":7701,"RtspUrl":"rtsp://smart-ewc.edgeway.io:7701/proxyStreamer_profile_1","serverIP":"","cameraRtspChannels":[{"profileName":"mainStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/101?transportmode=unicast\u0026profile=Profile_1","codec":"H264","resolution":2688,"fps":25},{"profileName":"subStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/102?transportmode=unicast\u0026profile=Profile_2","codec":"H264","resolution":2688,"fps":25}],"cameraNvrRecRtspPreferred":"mainStream","cameraAnalyzeRtspPreferred":"mainStream","info":{"uptime":0,"restartCount":0,"type":"","command":"","status":"","error":{"state":"","msg":""}}}]}]
-
-    error:
-      description: vcam status error
-      type: object
-      properties:
-        state:
-          type: string
-        msg:
-          type: string
-
-    Info:
-      description: Vcam information.
-      type: object
-      properties:
-        uptime:
-          type: integer
-        restartCount:
-          type: integer
-        type:
-          type: string
-        command:
-          type: string
-        status:
-          type: string
-        error:
-          type: object
-          properties:
-            state:
-              type: string
-            msg:
-              type: string
-        clients:
-          type: array
-          items:
-            $ref: '#/components/schemas/Client'
-        bitrate:
-          type: string
-
-    RtspChannel:
-      description: Rtsp channels.
-      type: object
-      properties:
-        profileName:
-          type: string
-        rtspUrl:
-          type: string
-        codec:
-          type: string
-        resolution:
-          type: integer
-        fps:
-          type: integer
-
-    VCams:
-      description: Vcam array.
-      type: array
-      items:
-        $ref: '#/components/schemas/VCam'
-
     VCam:
-      description: Vcam information for GUI.
+      description: virtual camera struct
       type: object
       properties:
         slotIndex:
@@ -688,28 +687,116 @@ components:
         info:
           type: array
           items:
-            $ref: '#/components/schemas/Client'
+            $ref: '#/components/schemas/VCinfo'
         ewc_instance_fqdn:
           type: string
         ewc_instance_name:
           type: string
         ewc_instance_id:
           type: string
-        multicast_ip:
-          type: string
-        multicast_port:
-          type: string
         heartbeat:
           type: string
+        device_uuid:
+          type: string
+        pcam_uuid:
+          type: string
+        primary_vcam_uuid:
+          type: string
+        publish_port:
+          type: string
+        post_processes:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostProcessInfo'
 
-    info:
+    Device:
+      description: device struct
+      type: object
+      properties:
+        deviceId:
+          type: string
+        deviceMAC:
+          type: string
+        UUID:
+          type: string
+        vcams:
+          type: array
+          items:
+            $ref: '#/components/schemas/VCam'
+
+    ArrayDevice:
+      description: array of devices
+      type: array
+      items:
+        $ref: '#/components/schemas/Device'
+
+    error:
+      description: vcam status error
+      type: object
+      properties:
+        state:
+          type: string
+        msg:
+          type: string
+
+    RtspChannel:
+      description: Rtsp channels.
+      type: object
+      properties:
+        profileName:
+          type: string
+        rtspUrl:
+          type: string
+        codec:
+          type: string
+        resolution:
+          type: integer
+        fps:
+          type: integer
+
+    VCams:
+      description: Vcam array.
+      type: array
+      items:
+        $ref: '#/components/schemas/VCam'
+
+    PostProcessInfo:
+      description: Post processes
+      type: object
+      properties:
+        uuid:
+          type: string
+        label:
+          type: string
+        type:
+          type: string
+        dst_multicast_ip:
+          type: string
+        dst_multicast_port:
+          type: string
+        src_multicast_ip:
+          type: string
+        status:
+          type: string
+        error:
+          type: object
+          items:
+            $ref: '#/components/schemas/PPError'
+
+    PPError:
+      type: object
+      properties:
+        state:
+          type: string
+        msg:
+          type: string
+
+    VCinfo:
       description: vcam info
       type: object
       properties:
-        slotIndex:
-          type: integer
         uptime:
-          type: integer
+          type: string
         restartCount:
           type: integer
         type:
@@ -720,19 +807,12 @@ components:
           type: string
         error:
           $ref: '#/components/schemas/error'
-
-    vcams:
-      description: vcam devices
-      type: object
-      properties:
-        deviceId:
-          type: string
-        mac:
-          type: string
-        info:
+        clients:
           type: array
           items:
-            $ref: '#/components/schemas/info'
+            $ref: '#/components/schemas/Client'
+        bitrate:
+          type: string
 
     Client:
       description: client information.
@@ -747,46 +827,18 @@ components:
         connectionTime:
           type: string
 
-    VCamsUpdate:
-      description: Vcam status, multicast port and IP, and heartbeat update.
+    VCUpdate:
+      description: VCAM type update.
       properties:
-        vcams:
-          type: array
-          items:
-            properties:
-              device_id:
-                type: string
-              info:
-                type: array
-                items:
-                  properties:
-                    slotIndex:
-                      type: string
-                    mac:
-                      type: string
-                    multicast_ip:
-                      type: string
-                    multicast_port:
-                      type: string
-                    uptime:
-                      type: string
-                    restartCount:
-                      type: string
-                    status:
-                      type: string
-                    error:
-                      type: object
-                      properties:
-                        state:
-                          type: string
-                        msg:
-                          type: string
-                    bitrate:
-                      type: string
-                    clients:
-                      type: array
-                      items:
-                      $ref: '#/components/schemas/Client'
+        vcaupdate:
+          type: object
+          properties:
+            change:
+              type: string
+              description: update type could be "type", "ewc", "state"
+            value:
+              type: string
+              description: values could be public, private
 
     VcamCommands:
       description: vcam commands
@@ -807,25 +859,99 @@ components:
               port:
                 type: string
 
-    getDevice:
-      description: device info
+    SPTS:
+      description: Post process SPTS information.
       type: object
       properties:
-        deviceId:
+        uuid:
           type: string
-        deviceMAC:
+        label:
           type: string
-        UUID:
+        status:
           type: string
-        vcams:
+        src_multicast_ip:
+          type: string
+        dst_multicast_ip:
+          type: string
+        dst_multicast_port:
+          type: string
+
+    PostProcessFeature:
+      description: Post process features information.
+      type: object
+      properties:
+        date:
+          type: string
+        spts:
           type: array
           items:
-            $ref: '#/components/schemas/vcams'
-      example: '{"deviceId":"603e36e24d50c80001d46c35","deviceMAC":"","UUID":"54d1ac67-96fd-4b13-b672-2c1eaa1350fc","vcams":[{"slotIndex":1,"mac":"b4:a3:82:47:89:7f","cameraBrand":"HIKVISION","cameraModel":"DS-2CD2542FWD-IS","uuid":"8502f8e6-02ed-4702-87d9-f6f535c92e7c","userName":"adminHK","password":"Aveiro35HK","onvifPort":7501,"onvifUrl":"http://smart-ewc.edgeway.io:7501/onvif/device_service","rtspPort":7701,"RtspUrl":"rtsp://smart-ewc.edgeway.io:7701/proxyStreamer_profile_1","serverIP":"","cameraRtspChannels":[{"profileName":"mainStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/101?transportmode=unicast\u0026profile=Profile_1","codec":"H264","resolution":2688,"fps":25},{"profileName":"subStream","rtspUrl":"rtsp://192.168.1.24:554/Streaming/Channels/102?transportmode=unicast\u0026profile=Profile_2","codec":"H264","resolution":2688,"fps":25}],"cameraNvrRecRtspPreferred":"mainStream","cameraAnalyzeRtspPreferred":"mainStream","info":{"uptime":0,"restartCount":0,"type":"","command":"","status":"","error":{"state":"","msg":""}}}}]}'
+            $ref: '#/components/schemas/SPTS'
     
-    vcamType:
-      description: Vcam type.
+    PCams:
+      description: array of physical cameras.
+      type: array
+      items:
+        $ref: '#/components/schemas/PCam'
+
+    PCam:
+      description: Physical camera struct
       type: object
       properties:
-        type:
+        id:
+          type: string
+        uuid:
+          type: integer
+        mac:
+          type: string
+        cameraBrand:
+          type: string
+        cameraModel:
+          type: string
+        serial_number:
+          type: string
+        hardware_id:
+          type: string
+        firmware_version:
+          type: string
+        userName:
+          type: string
+        password:
+          type: string
+        label:
+          type: integer
+        cameraRtspChannels:
+          type: array
+          items:
+             $ref: '#/components/schemas/RtspChannel'
+        active_route:
+          type: string
+        alternative_routes:
+          type: array
+          items:
+            properties:
+              alternative_routes:
+                type: string
+        virtual_cameras:
+          type: array
+          items:
+            properties:
+              alternative_routes:
+                type: string
+        MainRtsp:
+          type: string
+        IpAddr:
+          type: string
+        TestedStatus:
+          type: integer
+        heartbeat:
+          type: string
+        dst_multicast_ip:
+          type: string
+        src_multicast_ip:
+          type: string
+        dst_multicast_port:
+          type: string
+        spts_created_at:
+          type: string
+        spts_updated_at:
           type: string
