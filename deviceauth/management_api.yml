@@ -109,6 +109,7 @@ paths:
           required: true
           schema:
             type: string
+          description: could be 'max_devices'.
       responses:
         200:
           description: success to get the limit.
@@ -122,47 +123,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        500:
-          description: Internal server error.
+        401:
+          description: Unauthorised request.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-
-  /api/management/v2/devauth/devices/{id}/auth/{aid}/status:
-    get:
-      description: Get auth set status
-      summary: Get auth set status
-      security:
-      - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          description: Device identifier.
-          required: true
-          schema:
-            type: string
-        - name: aid
-          in: path
-          description: Authentication data set identifier.
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          description: success to get the authentication status.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Status'
         404:
-          description: The device was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: Request cannot be fulfilled e.g. due to exceeded limit on maximum accepted devices (see error message).
+          description: Not found.
           content:
             application/json:
               schema:
@@ -174,57 +142,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-    put:
-      description: Update device auth by device ID
-      summary: Update device auth by device ID
-      security:
-      - bearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          description: Device identifier.
-          required: true
-          schema:
-            type: string
-        - name: aid
-          in: path
-          description: Authentication data set identifier.
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DevAuthApiStatus'
-      responses:
-        204:
-          description: The device authentication data set status was successfully updated.
-        400:
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        404:
-          description: The device was not found.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        422:
-          description: Request cannot be fulfilled e.g. due to exceeded limit on maximum accepted devices (see error message).
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /api/management/v1/devauth/devices:
+  /api/management/v2/devauth/devices:
     get:
       summary: Get a list of tenant's devices.
       description: |
@@ -247,6 +165,20 @@ paths:
           type: number
           format: integer
           default: 20.0
+      - name: status
+        in: query
+        description: filter by status. status could be 'accepted', 'rejected', 'pending', 'preauthorized'.
+        required: true
+        schema:
+          type: string
+      - name: id_data
+        in: query
+        description: should be true or false
+        required: false
+        schema:
+          type: number
+          format: boolean
+          default: false
       responses:
         200:
           description: An array of devices.
@@ -263,6 +195,18 @@ paths:
                   $ref: '#/components/schemas/Device'
         400:
           description: Missing/malformed request params.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found.
           content:
             application/json:
               schema:
@@ -297,6 +241,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         409:
           description: Device already exists.
           content:
@@ -310,7 +266,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       x-codegen-request-body-name: pre_auth_request
-  /api/management/v1/devauth/devices/{id}:
+  /api/management/v2/devauth/devices/{id}:
     get:
       summary: Get a particular device.
       description: Get a particular device.
@@ -330,6 +286,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+        401:
+          description: Unauthorised request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: Device not found.
           content:
@@ -358,6 +320,12 @@ paths:
         204:
           description: Device decommissioned.
           content: {}
+        401:
+          description: Unauthorised request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         404:
           description: Device not found
           content:
@@ -370,7 +338,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v1/devauth//devices/{id}/auth/{aid}:
+  /api/management/v2/devauth/devices/{id}/auth/{aid}:
     delete:
       summary: Remove the device authentication set
       description: |
@@ -410,7 +378,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v1/devauth/devices/{id}/auth/{aid}/status:
+  /api/management/v2/devauth/devices/{id}/auth/{aid}/status:
     put:
       summary: Update the device authentication set status
       description: |
@@ -436,7 +404,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Status'
+              $ref: '#/components/schemas/DevAuthApiStatus'
         required: true
       responses:
         204:
@@ -445,6 +413,12 @@ paths:
           content: {}
         400:
           description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized request.
           content:
             application/json:
               schema:
@@ -469,7 +443,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
       x-codegen-request-body-name: status
-  /api/management/v1/devauth/devices/count:
+    get:
+      description: get device status.
+      security:
+      - bearerAuth: []
+      parameters:
+      - name: id
+        in: path
+        description: Device identifier.
+        required: true
+        schema:
+          type: string
+      - name: aid
+        in: path
+        description: Authentication data set identifier.
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: The device get status was successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        400:
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorized request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: The device was not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        422:
+          description: Request cannot be fulfilled e.g. due to exceeded limit on maximum
+            accepted devices (see error message).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/management/v2/devauth/devices/count:
     get:
       summary: Get a count of devices, optionally filtered by status.
       description: |
@@ -496,13 +525,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        401:
+          description: Unauthorised request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         500:
           description: Unexpected error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /api/management/v1/devauth/tokens/{id}:
+  /api/management/v2/devauth/tokens/{id}:
     delete:
       summary: Delete device token
       description: |
@@ -586,9 +627,10 @@ components:
       properties:
         status:
           type: string
+          description: "status could be accepted, rejected, pending"
         type:
           type: string
-          description: flavour type
+          description: flavour type VMS or VSAAS
         config_name:
           type: string
         flavor_name:
@@ -601,6 +643,7 @@ components:
       properties:
         status:
           type: string
+          description: "status could be accepted, rejected, pending"
 
     LimitValue:
       type: object
@@ -614,11 +657,13 @@ components:
         id:
           type: string
           description: Edgeway assigned Device ID.
-        id_data:
+        identity_data:
           type: string
           description: |-
             Vendor-specific JSON representation of device identity, encrypted with the tenant's public key.
             In reference implementation, it is a JSON structure with vendor-selected fields, such as MACs, serial numbers, etc.
+        status:
+          type: string
         created_ts:
           type: string
           description: Created timestamp
@@ -671,13 +716,17 @@ components:
       - pubkey
       type: object
       properties:
-        device_id:
+        type:
           type: string
-          description: Precomputed device ID.
-        auth_set_id:
+          description: VMS or VSAAS
+        config_name:
           type: string
-          description: Precomputed auth set ID.
-        id_data:
+          description: configuration name.
+          default: saas_default
+        flavor_name:
+          description: flavour name.
+          default: saas_default
+        identity_data:
           type: string
           description: Vendor-specific JSON representation of the device identity
             data (MACs, serial numbers, etc.).
@@ -685,10 +734,11 @@ components:
           type: string
           description: The device's public key, generated by the device or pre-provisioned
             by the vendor.
+        unique_devparams:
+          type: string
+          description: unique device param.
       example:
         application/json:
-          device_id: f7881e82-0492-49fb-b459-795654e7188a
-          auth_set_id: a7881e82-0492-49fb-b459-795654e7188f
           id_data: '{"mac":"00:01:02:03:04:05"}'
           pubkey: |
             -----BEGIN PUBLIC KEY-----
